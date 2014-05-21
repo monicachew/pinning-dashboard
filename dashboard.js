@@ -40,6 +40,7 @@ function makeChart(version, measure) {
           return count;
         });
         // Failure = 0, success = 1
+        date.setUTCHours(0);
         ts.push([date.getTime(), data[0] / (data[0] + data[1])]);
         volume.push([date.getTime(), data[0] + data[1]]);
       });
@@ -74,6 +75,7 @@ function makeHostChart(version) {
           return count;
         });
         // Failure = 0, success = 1
+        date.setUTCHours(0);
         Object.keys(hostIds).forEach(function(host) {
           index = hostIds[host].bucket * 2;
           rate = data[index] / (data[index] + data[index + 1]);

@@ -1,5 +1,7 @@
 "use strict";
 
+var minDate = new Date(2014, 4, 12);
+
 // Highcharts options.
 var tsChart;
 var tsOptions = {
@@ -24,6 +26,8 @@ var tsOptions = {
     title: {
       text: 'Date'
     },
+    minTickInterval: 24 * 3600 * 1000,
+    min: minDate.getTime()
   },
   yAxis: {
     title: {
@@ -63,6 +67,8 @@ var volumeOptions = {
     title: {
       text: 'Date'
     },
+    minTickInterval: 24 * 3600 * 1000,
+    min: minDate.getTime()
   },
   yAxis: {
     title: {
@@ -106,6 +112,8 @@ var hostOptions = {
     title: {
       text: 'Date'
     },
+    minTickInterval: 24 * 3600 * 1000,
+    min: minDate.getTime()
   },
   yAxis: {
     title: {
@@ -148,6 +156,8 @@ var hostVolumeOptions = {
     title: {
       text: 'Date'
     },
+    minTickInterval: 24 * 3600 * 1000,
+    min: minDate.getTime()
   },
   yAxis: {
     title: {
