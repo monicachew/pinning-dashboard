@@ -12,6 +12,7 @@ $(document).ready(function() {
   tsChart = new Highcharts.Chart(tsOptions);
   volumeChart = new Highcharts.Chart(volumeOptions);
   hostChart = new Highcharts.Chart(hostOptions);
+  hostVolumeChart = new Highcharts.Chart(hostVolumeOptions);
 });
 
 // Print auxiliary function
@@ -60,8 +61,10 @@ function makeHostChart(version) {
 
   // Set up our series
   var series = [];
+  var volume = [];
   Object.keys(hostIds).forEach(function(host) {
     series[hostIds[host].series] = [];
+    volume[hostIds[host].series] = [];
   });
 
   Telemetry.loadEvolutionOverBuilds(version, measure,
@@ -75,12 +78,18 @@ function makeHostChart(version) {
           index = hostIds[host].bucket * 2;
           rate = data[index] / (data[index] + data[index + 1]);
           series[hostIds[host].series].push([date.getTime(), rate]);
+          volume[hostIds[host].series].push([date.getTime(),
+                                             data[index] + data[index + 1]]);
         });
       });
       //print(JSON.stringify(series));
       Object.keys(hostIds).forEach(function(host) {
         hostChart.series[hostIds[host].series]
           .setData(series[hostIds[host].series], true);
+      });
+      Object.keys(hostIds).forEach(function(host) {
+        hostVolumeChart.series[hostIds[host].series]
+          .setData(volume[hostIds[host].series], true);
       });
     }
   );
