@@ -8,143 +8,6 @@ var requiredMeasures = {
   "CERT_PINNING_MOZ_RESULTS": 3,
 };
 
-var hostMeasures = {
-  "CERT_PINNING_MOZ_TEST_RESULTS_BY_HOST": 0,
-  //"CERT_PINNING_MOZ_RESULTS_BY_HOST": 1,
-};
-
-// Host index into host measures
-var hostIds = {
-  "addons.mozilla.org": 1,
-  "aus4.mozilla.org": 3
-};
-
-// Highcharts options.
-var tsChart;
-var tsOptions = {
-  chart: {
-    type: 'spline',
-    renderTo: 'timeseries',
-  },
-  title: {
-    text: 'Pinning violation rates',
-    x: -20 //center
-  },
-  subtitle: {
-    text: 'Source: telemetry.mozilla.org',
-    x: -20
-  },
-  xAxis: {
-    type: 'datetime',
-    dateTimeLabelFormats: { // don't display the dummy year
-      month: '%e. %b',
-      year: '%b'
-    },
-    title: {
-      text: 'Date'
-    },
-  },
-  yAxis: {
-    title: {
-      text: 'Pinning violation rate'
-    },
-    min: 0
-  },
-  legend: {
-    layout: 'vertical',
-    align: 'right',
-    verticalAlign: 'middle',
-    borderWidth: 0
-  },
-  series: [{ name: 'Test mode' },
-           { name: 'Production mode' },
-           { name: 'Mozilla test mode' },
-           { name: 'Mozilla production mode' },
-  ]
-};
-
-var volumeChart;
-var volumeOptions = {
-  chart: {
-    type: 'spline',
-    renderTo: 'volume',
-  },
-  title: {
-    text: 'Pinning volumes',
-    x: -20 //center
-  },
-  xAxis: {
-    type: 'datetime',
-    dateTimeLabelFormats: { // don't display the dummy year
-      month: '%e. %b',
-      year: '%b'
-    },
-    title: {
-      text: 'Date'
-    },
-  },
-  yAxis: {
-    title: {
-      text: 'Pinning volumes'
-    },
-    min: 0
-  },
-  legend: {
-    layout: 'vertical',
-    align: 'right',
-    verticalAlign: 'middle',
-    borderWidth: 0
-  },
-  series: [{ name: 'Test mode' },
-           { name: 'Production mode' },
-           { name: 'Mozilla test mode' },
-           { name: 'Mozilla production mode' },
-  ]
-};
-
-var hostChart;
-var hostOptions = {
-  chart: {
-    type: 'spline',
-    renderTo: 'host',
-  },
-  title: {
-    text: 'Pinning violation rates',
-    x: -20 //center
-  },
-  subtitle: {
-    text: 'Source: telemetry.mozilla.org',
-    x: -20
-  },
-  xAxis: {
-    type: 'datetime',
-    dateTimeLabelFormats: { // don't display the dummy year
-      month: '%e. %b',
-      year: '%b'
-    },
-    title: {
-      text: 'Date'
-    },
-  },
-  yAxis: {
-    title: {
-      text: 'Pinning violation rates'
-    },
-    min: 0
-  },
-  legend: {
-    layout: 'vertical',
-    align: 'right',
-    verticalAlign: 'middle',
-    borderWidth: 0
-  },
-  series: [{ name: 'addons.mozilla.org (test)' },
-           //{ name: 'addons.mozilla.org' },
-           { name: 'aus4.mozilla.org (test)' },
-           //{ name: 'aus4.mozilla.org' },
-  ]
-};
-
 $(document).ready(function() {
   tsChart = new Highcharts.Chart(tsOptions);
   volumeChart = new Highcharts.Chart(volumeOptions);
@@ -162,9 +25,7 @@ Telemetry.init(function() {
   Object.keys(requiredMeasures).forEach(function (measure) {
     makeChart(version, measure);
   });
-  Object.keys(hostMeasures).forEach(function (measure) {
-    makeHostChart(version, measure);
-  });
+  makeHostChart(version);
 });
 
 function makeChart(version, measure) {
@@ -187,29 +48,40 @@ function makeChart(version, measure) {
   );
 }
 
-function makeHostChart(version, measure) {
+function makeHostChart(version) {
+  var hostIds = {
+    "addons.mozilla.org": { bucket: 1, series: 0 },
+    "aus4.mozilla.org": { bucket: 3, series: 1 }
+  };
+  var data = [];
+  var index;
+  var rate;
+  var measure = "CERT_PINNING_MOZ_TEST_RESULTS_BY_HOST";
+
+  // Set up our series
+  var series = [];
+  Object.keys(hostIds).forEach(function(host) {
+    series[hostIds[host].series] = [];
+  });
+
   Telemetry.loadEvolutionOverBuilds(version, measure,
     function(histogramEvolution) {
-      var amo = [];
-      var amoId = hostIds["addons.mozilla.org"];
-
-      var aus4 = [];
-      var aus4Id = hostIds["aus4.mozilla.org"];
-
       histogramEvolution.each(function(date, histogram) {
-        var data = histogram.map(function(count, start, end, index) {
+        data = histogram.map(function(count, start, end, index) {
           return count;
         });
         // Failure = 0, success = 1
-        amo.push([date.getTime(), data[amoId * 2] /
-                                  (data[amoId * 2] + data[amoId * 2 + 1])]);
-        aus4.push([date.getTime(), data[aus4Id * 2] /
-                                  (data[aus4Id * 2] + data[aus4Id * 2 + 1])]);
+        Object.keys(hostIds).forEach(function(host) {
+          index = hostIds[host].bucket * 2;
+          rate = data[index] / (data[index] + data[index + 1]);
+          series[hostIds[host].series].push([date.getTime(), rate]);
+        });
       });
-      //hostChart.series[0].setData(amo, true);
-      //hostChart.series[1].setData(aus4, true);
-      //print(JSON.stringify(amo));
-      //print(JSON.stringify(aus4));
+      //print(JSON.stringify(series));
+      Object.keys(hostIds).forEach(function(host) {
+        hostChart.series[hostIds[host].series]
+          .setData(series[hostIds[host].series], true);
+      });
     }
   );
 }
