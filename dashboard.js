@@ -78,13 +78,15 @@ function makeHostChart(version) {
         date.setUTCHours(0);
         Object.keys(hostIds).forEach(function(host) {
           index = hostIds[host].bucket * 2;
-          rate = data[index] / (data[index] + data[index + 1]);
+          rate = 0;
+          if (data[index] && (data[index] + data[index + 1] > 0)) {
+            rate = data[index] / (data[index] + data[index + 1]);
+          }
           series[hostIds[host].series].push([date.getTime(), rate]);
           volume[hostIds[host].series].push([date.getTime(),
                                              data[index] + data[index + 1]]);
         });
       });
-      //print(JSON.stringify(series));
       Object.keys(hostIds).forEach(function(host) {
         hostChart.series[hostIds[host].series]
           .setData(series[hostIds[host].series], true);
