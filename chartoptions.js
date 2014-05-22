@@ -2,21 +2,21 @@
 
 var minDate = new Date(2014, 4, 12);
 
-// Will return something of the form:
-// https://hg.mozilla.org/mozilla-central/raw-file/xxxxxxxxxxxx/security/manager/boot/src/StaticHPKPins.h
 function changesetToPinFileURL(changeset) {
-  return "https://hg.mozilla.org/mozilla-central/raw-file/" +
+  return "https://hg.mozilla.org/mozilla-central/file/" +
          changeset +
          "/security/manager/boot/src/StaticHPKPins.h";
 }
 
 var buildDateToChangesetCache = {};
-function buildDateToChangeset(dateString) {
-  var date = new Date(dateString);
-  console.log("given date: " + date);
+function buildDateToChangeset(timeInMillis) {
+  var date = new Date(timeInMillis);
   if (buildDateToChangesetCache[date]) {
     return buildDateToChangesetCache[date];
   }
+  // This is fragile (for example, when nightly becomes Firefox 33, this won't
+  // work anymore). I'm told bug 487036 will implement what we actually want
+  // here.
   const preURL = "http://ftp.mozilla.org/pub/mozilla.org/firefox/nightly/";
   const postURL = "-mozilla-central-debug/firefox-32.0a1.en-US.debug-linux-i686.txt";
   // JSON format appears to be YYYY-MM-DDTHH:MM:SS.MMMZ,
@@ -36,7 +36,6 @@ function buildDateToChangeset(dateString) {
     return changeset;
   } catch (e) {
     // probably 404
-    buildDateToChangesetCache[date] = "";
     return null;
   }
 }
