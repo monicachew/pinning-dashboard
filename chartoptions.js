@@ -2,7 +2,57 @@
 
 var minDate = new Date(2014, 4, 12);
 
+function changesetToPinFileURL(changeset) {
+  return "https://hg.mozilla.org/mozilla-central/file/" +
+         changeset +
+         "/security/manager/boot/src/StaticHPKPins.h";
+}
+
+var buildDateToChangesetCache = {};
+function buildDateToChangeset(timeInMillis) {
+  var date = new Date(timeInMillis);
+  if (buildDateToChangesetCache[date]) {
+    return buildDateToChangesetCache[date];
+  }
+  // This is fragile (for example, when nightly becomes Firefox 33, this won't
+  // work anymore). I'm told bug 487036 will implement what we actually want
+  // here.
+  const preURL = "http://ftp.mozilla.org/pub/mozilla.org/firefox/nightly/";
+  const postURL = "-mozilla-central-debug/firefox-32.0a1.en-US.debug-linux-i686.txt";
+  // JSON format appears to be YYYY-MM-DDTHH:MM:SS.MMMZ,
+  // where "-", "T", ":", ".", and "Z" are literals.
+  // We just want YYYY-MM-DD.
+  var dateString = date.toJSON().split("T")[0];
+  var url = preURL + dateString + postURL;
+  var req = new XMLHttpRequest();
+  try {
+    req.open("GET", url, false); // asynchronous for now
+    req.send();
+    var changesetURL = req.responseText.split("\n")[1];
+    // changesetURL now looks like this:
+    // https://hg.mozilla.org/mozilla-central/rev/xxxxxxxxxxxx
+    var changeset = changesetURL.split("/").slice(-1);
+    buildDateToChangesetCache[date] = changeset;
+    return changeset;
+  } catch (e) {
+    // probably 404
+    return null;
+  }
+}
+
 // Highcharts options.
+var commonTooltip = {
+  useHTML: true,
+  hideDelay: 1000,
+  formatter: function() {
+    var changeset = buildDateToChangeset(this.x);
+    if (!changeset) {
+      return this.y;
+    }
+    var pinFileURL = changesetToPinFileURL(changeset);
+    return this.y + ": <a href='" + pinFileURL + "' target='_blank'>" + changeset + "</a>";
+  }
+};
 var tsChart;
 var tsOptions = {
   chart: {
@@ -45,7 +95,8 @@ var tsOptions = {
            { name: 'Production mode' },
            { name: 'Mozilla test mode' },
            { name: 'Mozilla production mode' },
-  ]
+  ],
+  tooltip: commonTooltip
 };
 
 var volumeChart;
@@ -86,7 +137,8 @@ var volumeOptions = {
            { name: 'Production mode' },
            { name: 'Mozilla test mode' },
            { name: 'Mozilla production mode' },
-  ]
+  ],
+  tooltip: commonTooltip
 };
 
 var hostChart;
@@ -130,7 +182,8 @@ var hostOptions = {
   series: [
     { name: 'addons.mozilla.org (test)' },
     { name: 'aus4.mozilla.org (test)' },
-  ]
+  ],
+  tooltip: commonTooltip
 };
 
 var hostVolumeChart;
@@ -174,5 +227,6 @@ var hostVolumeOptions = {
   series: [
     { name: 'addons.mozilla.org (test)' },
     { name: 'aus4.mozilla.org (test)' },
-  ]
+  ],
+  tooltip: commonTooltip
 };
