@@ -61,6 +61,12 @@ var commonTooltip = {
 $(function() {
   Highcharts.setOptions({
     tooltip: commonTooltip,
+    chart: {
+      type: 'spline',
+    },
+    title: {
+      x: -20 //center
+    },
     xAxis: {
       type: 'datetime',
       dateTimeLabelFormats: { // don't display the dummy year
@@ -72,6 +78,9 @@ $(function() {
       },
       minTickInterval: 24 * 3600 * 1000,
       min: minDate.getTime()
+    },
+    yAxis: {
+      min: 0
     },
     legend: {
       layout: 'vertical',
@@ -85,12 +94,10 @@ $(function() {
 var tsChart;
 var tsOptions = {
   chart: {
-    type: 'spline',
     renderTo: 'timeseries',
   },
   title: {
     text: 'Pinning violation rates',
-    x: -20 //center
   },
   subtitle: {
     text: 'Source: telemetry.mozilla.org',
@@ -100,7 +107,6 @@ var tsOptions = {
     title: {
       text: 'Pinning violation rate'
     },
-    min: 0
   },
   series: [{ name: 'Test mode' },
            { name: 'Production mode' },
@@ -112,18 +118,15 @@ var tsOptions = {
 var volumeChart;
 var volumeOptions = {
   chart: {
-    type: 'spline',
     renderTo: 'volume',
   },
   title: {
     text: 'Pinning volumes',
-    x: -20 //center
   },
   yAxis: {
     title: {
       text: 'Pinning volumes'
     },
-    min: 0
   },
   series: [{ name: 'Test mode' },
            { name: 'Production mode' },
@@ -135,12 +138,10 @@ var volumeOptions = {
 var hostChart;
 var hostOptions = {
   chart: {
-    type: 'spline',
     renderTo: 'host',
   },
   title: {
     text: 'Pinning violation rates for mozilla hosts',
-    x: -20 //center
   },
   subtitle: {
     text: 'Source: telemetry.mozilla.org',
@@ -150,7 +151,6 @@ var hostOptions = {
     title: {
       text: 'Pinning violation rates'
     },
-    min: 0
   },
   series: [
     { name: 'addons.mozilla.org (test)' },
@@ -161,12 +161,10 @@ var hostOptions = {
 var hostVolumeChart;
 var hostVolumeOptions = {
   chart: {
-    type: 'spline',
     renderTo: 'hostVolume',
   },
   title: {
     text: 'Pinning volumes for mozilla hosts',
-    x: -20 //center
   },
   subtitle: {
     text: 'Source: telemetry.mozilla.org',
@@ -176,7 +174,6 @@ var hostVolumeOptions = {
     title: {
       text: 'Pinning volumes'
     },
-    min: 0
   },
   series: [
     { name: 'addons.mozilla.org (test)' },
