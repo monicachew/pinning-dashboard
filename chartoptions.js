@@ -17,8 +17,8 @@ function buildDateToChangeset(timeInMillis) {
   // This is fragile (for example, when nightly becomes Firefox 33, this won't
   // work anymore). I'm told bug 487036 will implement what we actually want
   // here.
-  const preURL = "http://ftp.mozilla.org/pub/mozilla.org/firefox/nightly/";
-  const postURL = "-mozilla-central-debug/firefox-32.0a1.en-US.debug-linux-i686.txt";
+  var preURL = "http://ftp.mozilla.org/pub/mozilla.org/firefox/nightly/";
+  var postURL = "-mozilla-central-debug/firefox-32.0a1.en-US.debug-linux-i686.txt";
   // JSON format appears to be YYYY-MM-DDTHH:MM:SS.MMMZ,
   // where "-", "T", ":", ".", and "Z" are literals.
   // We just want YYYY-MM-DD.
@@ -46,13 +46,36 @@ var commonTooltip = {
   hideDelay: 1000,
   formatter: function() {
     var changeset = buildDateToChangeset(this.x);
+    var y = this.y;
+    if (this.y < 1) {
+      y = y.toFixed(6);
+    }
     if (!changeset) {
-      return this.y;
+      return y;
     }
     var pinFileURL = changesetToPinFileURL(changeset);
-    return this.y + ": <a href='" + pinFileURL + "' target='_blank'>" + changeset + "</a>";
+    return y + ": rev <a href='" + pinFileURL + "' target='_blank'>" + changeset + "</a>";
   }
 };
+
+$(function() {
+  Highcharts.setOptions({
+    tooltip: commonTooltip,
+    xAxis: {
+      type: 'datetime',
+      dateTimeLabelFormats: { // don't display the dummy year
+        month: '%e. %b',
+        year: '%b'
+      },
+      title: {
+        text: 'Date'
+      },
+      minTickInterval: 24 * 3600 * 1000,
+      min: minDate.getTime()
+    }
+  })
+});
+
 var tsChart;
 var tsOptions = {
   chart: {
@@ -66,18 +89,6 @@ var tsOptions = {
   subtitle: {
     text: 'Source: telemetry.mozilla.org',
     x: -20
-  },
-  xAxis: {
-    type: 'datetime',
-    dateTimeLabelFormats: { // don't display the dummy year
-      month: '%e. %b',
-      year: '%b'
-    },
-    title: {
-      text: 'Date'
-    },
-    minTickInterval: 24 * 3600 * 1000,
-    min: minDate.getTime()
   },
   yAxis: {
     title: {
@@ -95,8 +106,7 @@ var tsOptions = {
            { name: 'Production mode' },
            { name: 'Mozilla test mode' },
            { name: 'Mozilla production mode' },
-  ],
-  tooltip: commonTooltip
+  ]
 };
 
 var volumeChart;
@@ -108,18 +118,6 @@ var volumeOptions = {
   title: {
     text: 'Pinning volumes',
     x: -20 //center
-  },
-  xAxis: {
-    type: 'datetime',
-    dateTimeLabelFormats: { // don't display the dummy year
-      month: '%e. %b',
-      year: '%b'
-    },
-    title: {
-      text: 'Date'
-    },
-    minTickInterval: 24 * 3600 * 1000,
-    min: minDate.getTime()
   },
   yAxis: {
     title: {
@@ -138,7 +136,7 @@ var volumeOptions = {
            { name: 'Mozilla test mode' },
            { name: 'Mozilla production mode' },
   ],
-  tooltip: commonTooltip
+  //tooltip: commonTooltip
 };
 
 var hostChart;
@@ -154,18 +152,6 @@ var hostOptions = {
   subtitle: {
     text: 'Source: telemetry.mozilla.org',
     x: -20
-  },
-  xAxis: {
-    type: 'datetime',
-    dateTimeLabelFormats: { // don't display the dummy year
-      month: '%e. %b',
-      year: '%b'
-    },
-    title: {
-      text: 'Date'
-    },
-    minTickInterval: 24 * 3600 * 1000,
-    min: minDate.getTime()
   },
   yAxis: {
     title: {
@@ -183,7 +169,6 @@ var hostOptions = {
     { name: 'addons.mozilla.org (test)' },
     { name: 'aus4.mozilla.org (test)' },
   ],
-  tooltip: commonTooltip
 };
 
 var hostVolumeChart;
@@ -199,18 +184,6 @@ var hostVolumeOptions = {
   subtitle: {
     text: 'Source: telemetry.mozilla.org',
     x: -20
-  },
-  xAxis: {
-    type: 'datetime',
-    dateTimeLabelFormats: { // don't display the dummy year
-      month: '%e. %b',
-      year: '%b'
-    },
-    title: {
-      text: 'Date'
-    },
-    minTickInterval: 24 * 3600 * 1000,
-    min: minDate.getTime()
   },
   yAxis: {
     title: {
@@ -228,5 +201,4 @@ var hostVolumeOptions = {
     { name: 'addons.mozilla.org (test)' },
     { name: 'aus4.mozilla.org (test)' },
   ],
-  tooltip: commonTooltip
 };
