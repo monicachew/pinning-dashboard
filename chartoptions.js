@@ -72,7 +72,13 @@ $(function() {
       },
       minTickInterval: 24 * 3600 * 1000,
       min: minDate.getTime()
-    }
+    },
+    legend: {
+      layout: 'vertical',
+      align: 'right',
+      verticalAlign: 'middle',
+      borderWidth: 0
+    },
   })
 });
 
@@ -96,12 +102,6 @@ var tsOptions = {
     },
     min: 0
   },
-  legend: {
-    layout: 'vertical',
-    align: 'right',
-    verticalAlign: 'middle',
-    borderWidth: 0
-  },
   series: [{ name: 'Test mode' },
            { name: 'Production mode' },
            { name: 'Mozilla test mode' },
@@ -124,12 +124,6 @@ var volumeOptions = {
       text: 'Pinning volumes'
     },
     min: 0
-  },
-  legend: {
-    layout: 'vertical',
-    align: 'right',
-    verticalAlign: 'middle',
-    borderWidth: 0
   },
   series: [{ name: 'Test mode' },
            { name: 'Production mode' },
@@ -158,12 +152,6 @@ var hostOptions = {
     },
     min: 0
   },
-  legend: {
-    layout: 'vertical',
-    align: 'right',
-    verticalAlign: 'middle',
-    borderWidth: 0
-  },
   series: [
     { name: 'addons.mozilla.org (test)' },
     { name: 'aus4.mozilla.org (test)' },
@@ -189,12 +177,6 @@ var hostVolumeOptions = {
       text: 'Pinning volumes'
     },
     min: 0
-  },
-  legend: {
-    layout: 'vertical',
-    align: 'right',
-    verticalAlign: 'middle',
-    borderWidth: 0
   },
   series: [
     { name: 'addons.mozilla.org (test)' },
