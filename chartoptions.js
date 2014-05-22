@@ -62,7 +62,7 @@ $(function() {
   Highcharts.setOptions({
     tooltip: commonTooltip,
     chart: {
-      type: 'spline',
+      type: 'spline'
     },
     title: {
       x: -20 //center
@@ -87,21 +87,17 @@ $(function() {
       align: 'right',
       verticalAlign: 'middle',
       borderWidth: 0
-    },
+    }
   })
 });
 
 var tsChart;
 var tsOptions = {
   chart: {
-    renderTo: 'timeseries',
+    renderTo: 'timeseries'
   },
   title: {
-    text: 'Pinning violation rates',
-  },
-  subtitle: {
-    text: 'Source: telemetry.mozilla.org',
-    x: -20
+    text: 'Pinning violation rates'
   },
   yAxis: {
     title: {
@@ -111,41 +107,37 @@ var tsOptions = {
   series: [{ name: 'Test mode' },
            { name: 'Production mode' },
            { name: 'Mozilla test mode' },
-           { name: 'Mozilla production mode' },
+           { name: 'Mozilla production mode' }
   ]
 };
 
 var volumeChart;
 var volumeOptions = {
   chart: {
-    renderTo: 'volume',
+    renderTo: 'volume'
   },
   title: {
-    text: 'Pinning volumes',
+    text: 'Pinning volumes'
   },
   yAxis: {
     title: {
       text: 'Pinning volumes'
-    },
+    }
   },
   series: [{ name: 'Test mode' },
            { name: 'Production mode' },
            { name: 'Mozilla test mode' },
-           { name: 'Mozilla production mode' },
-  ],
+           { name: 'Mozilla production mode' }
+  ]
 };
 
 var hostChart;
 var hostOptions = {
   chart: {
-    renderTo: 'host',
+    renderTo: 'host'
   },
   title: {
-    text: 'Pinning violation rates for mozilla hosts',
-  },
-  subtitle: {
-    text: 'Source: telemetry.mozilla.org',
-    x: -20
+    text: 'Pinning violation rates for mozilla hosts'
   },
   yAxis: {
     title: {
@@ -154,21 +146,17 @@ var hostOptions = {
   },
   series: [
     { name: 'addons.mozilla.org (test)' },
-    { name: 'aus4.mozilla.org (test)' },
-  ],
+    { name: 'aus4.mozilla.org (test)' }
+  ]
 };
 
 var hostVolumeChart;
 var hostVolumeOptions = {
   chart: {
-    renderTo: 'hostVolume',
+    renderTo: 'hostVolume'
   },
   title: {
-    text: 'Pinning volumes for mozilla hosts',
-  },
-  subtitle: {
-    text: 'Source: telemetry.mozilla.org',
-    x: -20
+    text: 'Pinning volumes for mozilla hosts'
   },
   yAxis: {
     title: {
@@ -177,6 +165,6 @@ var hostVolumeOptions = {
   },
   series: [
     { name: 'addons.mozilla.org (test)' },
-    { name: 'aus4.mozilla.org (test)' },
-  ],
+    { name: 'aus4.mozilla.org (test)' }
+  ]
 };
