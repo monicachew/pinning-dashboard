@@ -136,7 +136,6 @@ var volumeOptions = {
            { name: 'Mozilla test mode' },
            { name: 'Mozilla production mode' },
   ],
-  //tooltip: commonTooltip
 };
 
 var hostChart;
