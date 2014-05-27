@@ -9,10 +9,10 @@ var requiredMeasures = {
 };
 
 $(document).ready(function() {
-  tsChart = new Highcharts.Chart(tsOptions);
-  volumeChart = new Highcharts.Chart(volumeOptions);
-  hostChart = new Highcharts.Chart(hostOptions);
-  hostVolumeChart = new Highcharts.Chart(hostVolumeOptions);
+  tsChart = new Highcharts.StockChart(tsOptions);
+  volumeChart = new Highcharts.StockChart(volumeOptions);
+  hostChart = new Highcharts.StockChart(hostOptions);
+  hostVolumeChart = new Highcharts.StockChart(hostVolumeOptions);
 });
 
 // Print auxiliary function
