@@ -53,8 +53,8 @@ var commonTooltip = {
            "' target='_blank'>" + changeset + "</a>";
     }
     $.each(this.points, function(i, point) {
-      var y = this.y;
-      if (this.y < 1) {
+      var y = point.y;
+      if (point.y < 1) {
         y = y.toFixed(6);
       }
       s += "<br/>" + point.series.name + ": " + y;
@@ -76,7 +76,9 @@ var flags = {
       title: 'B',
       text: 'Google switched to root PEMs'
     }
-  ]
+  ],
+  shape: 'circlepin',
+  width: 16,
 };
 
 $(function() {
@@ -118,8 +120,8 @@ var tsOptions = {
       text: 'Pinning violation rate'
     },
   },
-  series: [{ name: 'Test mode' },
-           { name: 'Production mode' },
+  series: [{ name: 'Test mode', id: 'testmode' },
+           { name: 'Production mode', id: 'productionmode' },
            { name: 'Mozilla test mode' },
            { name: 'Mozilla production mode' },
            flags
