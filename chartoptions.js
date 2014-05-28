@@ -67,18 +67,16 @@ var flags = {
   type: 'flags',
   data: [
     {
-      x: Date.UTC(2014, 4, 24),
-      title: 'A',
+      x: Date.UTC(2014, 4, 23),
+      title: 'Twitter production',
       text: 'Twitter moved to production'
     },
     {
-      x: Date.UTC(2014, 4, 24),
-      title: 'B',
+      x: Date.UTC(2014, 4, 23),
+      title: 'Google root PEMs',
       text: 'Google switched to root PEMs'
     }
-  ],
-  shape: 'circlepin',
-  width: 16,
+  ]
 };
 
 $(function() {
@@ -120,8 +118,8 @@ var tsOptions = {
       text: 'Pinning violation rate'
     },
   },
-  series: [{ name: 'Test mode', id: 'testmode' },
-           { name: 'Production mode', id: 'productionmode' },
+  series: [{ name: 'Test mode' },
+           { name: 'Production mode' },
            { name: 'Mozilla test mode' },
            { name: 'Mozilla production mode' },
            flags
