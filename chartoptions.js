@@ -46,16 +46,37 @@ var commonTooltip = {
   hideDelay: 1000,
   formatter: function() {
     var changeset = buildDateToChangeset(this.x);
-    var y = this.y;
-    if (this.y < 1) {
-      y = y.toFixed(6);
-    }
-    if (!changeset) {
-      return y;
-    }
     var pinFileURL = changesetToPinFileURL(changeset);
-    return y + ": rev <a href='" + pinFileURL + "' target='_blank'>" + changeset + "</a>";
+    var s = "<b>" + Highcharts.dateFormat("%A, %b %e", this.x) + "</b>";
+    if (changeset) {
+      s += "<br/>Changeset: <a href='" + pinFileURL +
+           "' target='_blank'>" + changeset + "</a>";
+    }
+    $.each(this.points, function(i, point) {
+      var y = point.y;
+      if (point.y < 1) {
+        y = y.toFixed(6);
+      }
+      s += "<br/>" + point.series.name + ": " + y;
+    });
+    return s;
   }
+};
+
+var flags = {
+  type: 'flags',
+  data: [
+    {
+      x: Date.UTC(2014, 4, 23),
+      title: 'Twitter production',
+      text: 'Twitter moved to production'
+    },
+    {
+      x: Date.UTC(2014, 4, 23),
+      title: 'Google root PEMs',
+      text: 'Google switched to root PEMs'
+    }
+  ]
 };
 
 $(function() {
@@ -69,13 +90,6 @@ $(function() {
     },
     xAxis: {
       type: 'datetime',
-      dateTimeLabelFormats: { // don't display the dummy year
-        month: '%e. %b',
-        year: '%b'
-      },
-      title: {
-        text: 'Date'
-      },
       minTickInterval: 24 * 3600 * 1000,
       min: minDate.getTime()
     },
@@ -107,7 +121,8 @@ var tsOptions = {
   series: [{ name: 'Test mode' },
            { name: 'Production mode' },
            { name: 'Mozilla test mode' },
-           { name: 'Mozilla production mode' }
+           { name: 'Mozilla production mode' },
+           flags
   ]
 };
 
@@ -127,7 +142,8 @@ var volumeOptions = {
   series: [{ name: 'Test mode' },
            { name: 'Production mode' },
            { name: 'Mozilla test mode' },
-           { name: 'Mozilla production mode' }
+           { name: 'Mozilla production mode' },
+           flags
   ]
 };
 

@@ -9,10 +9,10 @@ var requiredMeasures = {
 };
 
 $(document).ready(function() {
-  tsChart = new Highcharts.Chart(tsOptions);
-  volumeChart = new Highcharts.Chart(volumeOptions);
-  hostChart = new Highcharts.Chart(hostOptions);
-  hostVolumeChart = new Highcharts.Chart(hostVolumeOptions);
+  tsChart = new Highcharts.StockChart(tsOptions);
+  volumeChart = new Highcharts.StockChart(volumeOptions);
+  hostChart = new Highcharts.StockChart(hostOptions);
+  hostVolumeChart = new Highcharts.StockChart(hostVolumeOptions);
 });
 
 // Print auxiliary function
@@ -39,10 +39,14 @@ function makeChart(version, measure) {
         var data = histogram.map(function(count, start, end, index) {
           return count;
         });
-        // Failure = 0, success = 1
-        date.setUTCHours(0);
-        ts.push([date.getTime(), data[0] / (data[0] + data[1])]);
-        volume.push([date.getTime(), data[0] + data[1]]);
+        // Skip dates with fewer than 100 submissions
+        var minVolume = 100;
+        if (data[0] + data[1] > minVolume) {
+          // Failure = 0, success = 1
+          date.setUTCHours(0);
+          ts.push([date.getTime(), data[0] / (data[0] + data[1])]);
+          volume.push([date.getTime(), data[0] + data[1]]);
+        }
       });
       tsChart.series[index].setData(ts, true);
       volumeChart.series[index].setData(volume, true);
