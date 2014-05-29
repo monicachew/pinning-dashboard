@@ -65,6 +65,7 @@ var commonTooltip = {
 
 var flags = {
   type: 'flags',
+  showInLegend: false,
   data: [
     {
       x: Date.UTC(2014, 4, 23),
@@ -96,17 +97,18 @@ $(function() {
     yAxis: {
       min: 0
     },
-    legend: {
-      layout: 'vertical',
-      align: 'right',
-      verticalAlign: 'middle',
-      borderWidth: 0
-    }
   })
 });
 
 var tsChart;
 var tsOptions = {
+  legend: {
+    enabled: true,
+    layout: 'vertical',
+    align: 'right',
+    verticalAlign: 'middle',
+    borderWidth: 2
+  },
   chart: {
     renderTo: 'timeseries'
   },
@@ -128,6 +130,13 @@ var tsOptions = {
 
 var volumeChart;
 var volumeOptions = {
+  legend: {
+    enabled: true,
+    layout: 'vertical',
+    align: 'right',
+    verticalAlign: 'middle',
+    borderWidth: 2
+  },
   chart: {
     renderTo: 'volume'
   },
@@ -149,6 +158,13 @@ var volumeOptions = {
 
 var hostChart;
 var hostOptions = {
+  legend: {
+    enabled: true,
+    layout: 'vertical',
+    align: 'right',
+    verticalAlign: 'middle',
+    borderWidth: 2
+  },
   chart: {
     renderTo: 'host'
   },
@@ -168,6 +184,13 @@ var hostOptions = {
 
 var hostVolumeChart;
 var hostVolumeOptions = {
+  legend: {
+    enabled: true,
+    layout: 'vertical',
+    align: 'right',
+    verticalAlign: 'middle',
+    borderWidth: 2
+  },
   chart: {
     renderTo: 'hostVolume'
   },
