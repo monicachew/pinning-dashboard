@@ -39,8 +39,8 @@ function makeChart(version, measure) {
         var data = histogram.map(function(count, start, end, index) {
           return count;
         });
-        // Skip dates with fewer than 100 submissions
-        var minVolume = 100;
+        // Skip dates with fewer than 1000 submissions
+        var minVolume = 1000;
         if (data[0] + data[1] > minVolume) {
           // Failure = 0, success = 1
           date.setUTCHours(0);
