@@ -68,14 +68,19 @@ var flags = {
   showInLegend: false,
   data: [
     {
-      x: Date.UTC(2014, 4, 23),
+      x: Date.UTC(2014, 4, 24),
       title: 'Twitter production',
       text: 'Twitter moved to production'
     },
     {
-      x: Date.UTC(2014, 4, 23),
+      x: Date.UTC(2014, 4, 24),
       title: 'Google root PEMs',
       text: 'Google switched to root PEMs'
+    },
+    {
+      x: Date.UTC(2014, 4, 29),
+      title: 'Mozilla cdn, media production',
+      text: 'Mozilla cdn, media production'
     }
   ]
 };
