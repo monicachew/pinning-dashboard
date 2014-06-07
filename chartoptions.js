@@ -81,6 +81,18 @@ var flags = {
       x: Date.UTC(2014, 4, 29),
       title: 'Mozilla cdn, media production',
       text: 'Mozilla cdn, media production'
+    },
+  ]
+};
+
+var moz_flags = {
+  type: 'flags',
+  showInLegend: false,
+  data: [
+    {
+      x: Date.UTC(2014, 5, 5),
+      title: 'Mozilla AMO production',
+      text: 'Mozilla AMO production'
     }
   ]
 };
@@ -183,7 +195,9 @@ var hostOptions = {
   },
   series: [
     { name: 'addons.mozilla.org (test)' },
-    { name: 'aus4.mozilla.org (test)' }
+    { name: 'addons.mozilla.org (prod)' },
+    { name: 'aus4.mozilla.org (test)' },
+    moz_flags
   ]
 };
 
@@ -209,6 +223,8 @@ var hostVolumeOptions = {
   },
   series: [
     { name: 'addons.mozilla.org (test)' },
-    { name: 'aus4.mozilla.org (test)' }
+    { name: 'addons.mozilla.org (prod)' },
+    { name: 'aus4.mozilla.org (test)' },
+    moz_flags
   ]
 };
