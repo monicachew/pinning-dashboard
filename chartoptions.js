@@ -63,6 +63,7 @@ var commonTooltip = {
   }
 };
 
+// Events for hosts for which we don't have per-host violations.
 var flags = {
   type: 'flags',
   showInLegend: false,
@@ -85,6 +86,7 @@ var flags = {
   ]
 };
 
+// Events for mozilla hosts for which we have per-host violations.
 var moz_flags = {
   type: 'flags',
   showInLegend: false,
@@ -93,6 +95,11 @@ var moz_flags = {
       x: Date.UTC(2014, 5, 5),
       title: 'Mozilla AMO production',
       text: 'Mozilla AMO production'
+    },
+    {
+      x: Date.UTC(2014, 5, 8),
+      title: 'Mozilla FxA test',
+      text: 'Mozilla FxA test'
     }
   ]
 };
@@ -197,6 +204,7 @@ var hostOptions = {
     { name: 'addons.mozilla.org (test)' },
     { name: 'addons.mozilla.org (prod)' },
     { name: 'aus4.mozilla.org (test)' },
+    { name: 'accounts.firefox.com (test)' },
     moz_flags
   ]
 };
@@ -225,6 +233,7 @@ var hostVolumeOptions = {
     { name: 'addons.mozilla.org (test)' },
     { name: 'addons.mozilla.org (prod)' },
     { name: 'aus4.mozilla.org (test)' },
+    { name: 'accounts.firefox.com (test)' },
     moz_flags
   ]
 };

@@ -12,6 +12,7 @@ var hostIds = {
   "addons.mozilla.org (test)": { bucket: 1, series: 0 },
   "addons.mozilla.org (prod)": { bucket: 1, series: 1 },
   "aus4.mozilla.org (test)": { bucket: 3, series: 2 },
+  "accounts.firefox.com (test)": { bucket: 4, series: 3 },
 };
 
 $(document).ready(function() {
