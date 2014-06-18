@@ -8,6 +8,9 @@ var requiredMeasures = {
   "CERT_PINNING_MOZ_RESULTS": 3,
 };
 
+var tsSeries = { 0: [], 1: [], 2: [], 3: [] };
+var volumeSeries = { 0: [], 1: [], 2: [], 3: [] };
+
 var hostIds = {
   "addons.mozilla.org (test)": { bucket: 1, series: 0 },
   "addons.mozilla.org (prod)": { bucket: 1, series: 1 },
@@ -27,38 +30,84 @@ function print(line) {
   document.querySelector('#output').textContent += line + "\n";
 };
 
+var versionedMeasures = [];
+
+// Returns a promise that resolves when all of the requires measures from the
+// given version have had their timeseries added.
+function verifyVersion(v)
+{
+  var promises = [];
+  var p = new Promise(function(resolve, reject) {
+    Telemetry.measures(v, function(measures) {
+      for (var m in measures) {
+        if (m in requiredMeasures) {
+          promises.push(makeTimeseries(v, m));
+        }
+      }
+      resolve(Promise.all(promises));
+    });
+  });
+  return p;
+}
+
+function verifyMeasures()
+{
+  // construct a single graph for all versions of nightly
+  var versions = [ "nightly/32", "nightly/33" ];
+  var p1 = verifyVersion("nightly/32");
+  var p2 = verifyVersion("nightly/33");
+  return Promise.all([p1, p2]);
+}
+
 // Initialize telemetry.js
 Telemetry.init(function() {
-  var version = "nightly/32";
-  Object.keys(requiredMeasures).forEach(function (measure) {
-    makeChart(version, measure);
-  });
-  makeHostChart(version);
+  // For nightly versions, we only have one release per date, so we can
+  // construct a single graph for all versions of nightly
+  verifyMeasures()
+    //.then(setSeries())
+    .then(print("done"));
 });
 
-function makeChart(version, measure) {
-  Telemetry.loadEvolutionOverBuilds(version, measure,
-    function(histogramEvolution) {
-      var ts = [];
-      var volume = [];
-      var index = requiredMeasures[measure];
-      histogramEvolution.each(function(date, histogram) {
-        var data = histogram.map(function(count, start, end, index) {
-          return count;
+// Returns a promise that resolves when all of the data has been loaded for a
+// particular measure.
+function makeTimeseries(version, measure) {
+  var index = requiredMeasures[measure];
+  var p = new Promise(function(resolve, reject) {
+    Telemetry.loadEvolutionOverBuilds(version, measure,
+      function(histogramEvolution) {
+        histogramEvolution.each(function(date, histogram) {
+          var data = histogram.map(function(count, start, end, index) {
+            return count;
+          });
+          // Skip dates with fewer than 1000 submissions
+          var minVolume = 1000;
+          if (data[0] + data[1] > minVolume) {
+            // Failure = 0, success = 1
+            date.setUTCHours(0);
+            print("Measure: " + measure + " version: " + version +
+                  " Date: " + date.toString() + " total: " +
+                  (data[0] + data[1]) + " violations: " + data[0]);
+            tsSeries[index].push([date.getTime(),
+                                  data[0] / (data[0] + data[1])]);
+            volumeSeries[index].push([date.getTime(),
+                                      data[0] + data[1]]);
+          }
         });
-        // Skip dates with fewer than 1000 submissions
-        var minVolume = 1000;
-        if (data[0] + data[1] > minVolume) {
-          // Failure = 0, success = 1
-          date.setUTCHours(0);
-          ts.push([date.getTime(), data[0] / (data[0] + data[1])]);
-          volume.push([date.getTime(), data[0] + data[1]]);
-        }
-      });
-      tsChart.series[index].setData(ts, true);
-      volumeChart.series[index].setData(volume, true);
-    }
-  );
+        //print("resolving maketimeseries " + JSON.stringify(tsSeries[index], undefined, 2));
+        resolve(true);
+      }
+    );
+  });
+  return p;
+}
+
+function setSeries() {
+  for (var i in tsSeries) {
+    print("setting series: " + JSON.stringify(tsSeries[i], undefined, 2));
+    tsChart.series[i].setData(tsSeries[i], true);
+    volumeChart.series[i].setData(volumeSeries[i], true);
+  }
+  return Promise.resolve(true);
 }
 
 function hostMatchesType(host, type) {
