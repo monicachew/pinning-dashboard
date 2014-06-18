@@ -52,18 +52,15 @@ function print(line) {
 };
 
 function changeView(channel) {
+  // Unselect the old channel
+  document.querySelector("#" + currentChannel)
+      .setAttribute("style", "background-color:white");
   currentChannel = channel;
   makeGraphsForChannel(currentChannel);
-  // Toggle selector. The highlighted button uses the same green color as
+  // Select the new channel. The highlighted button uses the same green color as
   // Highcharts.
   document.querySelector("#" + currentChannel)
     .setAttribute("style", "background-color:#90ed7d");
-  Object.keys(channels).forEach(function(channel) {
-    if (channel != currentChannel) {
-      document.querySelector("#" + channel)
-        .setAttribute("style", "background-color:white");
-    }
-  });
 }
 
 // Initialize telemetry.js
@@ -153,9 +150,6 @@ function makeTimeseriesForMeasure(version, measure) {
           // Failure = 0, success = 1
           if (data[0] + data[1] > minVolume) {
             date.setUTCHours(0);
-            //print("Measure: " + measure + " version: " + version +
-            //      " Date: " + date.toString() + " total: " +
-            //      (data[0] + data[1]) + " violations: " + data[0]);
             tsSeries[index].push([date.getTime(),
                                   data[0] / (data[0] + data[1])]);
             volumeSeries[index].push([date.getTime(),
