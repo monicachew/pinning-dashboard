@@ -92,6 +92,11 @@ var flags = {
       title: 'Mozilla cdn, media production',
       text: 'Mozilla cdn, media production'
     },
+    {
+      x: Date.UTC(2014, 5, 13),
+      title: 'Google production',
+      text: 'Google moved to production'
+    },
   ]
 };
 
@@ -102,13 +107,13 @@ var moz_flags = {
   data: [
     {
       x: Date.UTC(2014, 5, 5),
-      title: 'Mozilla AMO production',
-      text: 'Mozilla AMO production'
+      title: 'AMO production',
+      text: 'AMO production'
     },
     {
       x: Date.UTC(2014, 5, 8),
-      title: 'Mozilla FxA test',
-      text: 'Mozilla FxA test'
+      title: 'FxA test',
+      text: 'FxA test'
     }
   ]
 };
