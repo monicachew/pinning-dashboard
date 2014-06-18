@@ -21,7 +21,8 @@ var hostIds = {
 };
 
 // Versions for which we have any data.
-var versions = [ "nightly/32", "nightly/33" ];
+var auroraVersions = [ "aurora/32" ];
+var nightlyVersions = [ "nightly/32", "nightly/33" ];
 
 // Minimum volume for which to display data
 var minVolume = 1000;
@@ -32,18 +33,8 @@ var versionedMeasures = [];
 // Set up our series
 var tsSeries = {};
 var volumeSeries = {};
-Object.keys(requiredMeasures).forEach(function(m) {
-  tsSeries[requiredMeasures[m]] = [];
-  volumeSeries[requiredMeasures[m]] = [];
-});
-
 var hostRates = [];
 var hostVolume = [];
-Object.keys(hostIds).forEach(function(host) {
-  hostRates[hostIds[host].series] = [];
-  hostVolume[hostIds[host].series] = [];
-});
-
 // Setup our highcharts on document-ready.
 $(document).ready(function() {
   tsChart = new Highcharts.StockChart(tsOptions);
@@ -61,10 +52,23 @@ function print(line) {
 Telemetry.init(function() {
   // For nightly versions, we only have one release per date, so we can
   // construct a single graph for all versions of nightly.
-  makeTimeseries();
-  makeHostCharts();
+  makeGraphsForChannel(nightlyVersions);
 });
 
+function makeGraphsForChannel(versions) {
+  Object.keys(requiredMeasures).forEach(function(m) {
+    tsSeries[requiredMeasures[m]] = [];
+    volumeSeries[requiredMeasures[m]] = [];
+  });
+
+  Object.keys(hostIds).forEach(function(host) {
+    hostRates[hostIds[host].series] = [];
+    hostVolume[hostIds[host].series] = [];
+  });
+
+  makeTimeseries(versions);
+  makeHostCharts(versions);
+}
 // Sort [date, {rate|volume}] pairs based on the date
 function sortByDate(p1, p2)
 {
@@ -73,7 +77,7 @@ function sortByDate(p1, p2)
 
 // Returns a promise that resolves when all of the versions for all of the
 // required measures have been stuffed into the timeseries.
-function makeTimeseries()
+function makeTimeseries(versions)
 {
   // construct a single graph for all versions of nightly
   var promises = [];
@@ -148,7 +152,7 @@ function makeTimeseriesForMeasure(version, measure) {
   return p;
 }
 
-function makeHostCharts() {
+function makeHostCharts(versions) {
   var promises = [];
   hostMeasures.forEach(function(m) {
     versions.forEach(function(v) {
