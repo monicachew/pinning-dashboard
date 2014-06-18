@@ -1,7 +1,7 @@
 <title>Public Key Pinning Dashboard</title>
 <center>
-<button onclick="makeGraphsForChannel(nightlyVersions)">Nightly</button>
-<button onclick="makeGraphsForChannel(auroraVersions)">Aurora</button>
+<button id=nightly onclick="changeView('nightly')">Nightly</button>
+<button id=aurora onclick="changeView('aurora')">Aurora</button>
 </center>
 <head>
 <script src="http://telemetry.mozilla.org/v1/telemetry.js"></script>

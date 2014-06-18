@@ -21,8 +21,11 @@ var hostIds = {
 };
 
 // Versions for which we have any data.
-var auroraVersions = [ "aurora/32" ];
-var nightlyVersions = [ "nightly/32", "nightly/33" ];
+var channels = {
+  nightly: [ "nightly/32", "nightly/33" ],
+  aurora: [ "aurora/32" ]
+};
+var currentChannel = "nightly";
 
 // Minimum volume for which to display data
 var minVolume = 1000;
@@ -48,14 +51,29 @@ function print(line) {
   document.querySelector('#output').textContent += line + "\n";
 };
 
+function changeView(channel) {
+  currentChannel = channel;
+  makeGraphsForChannel(currentChannel);
+  // Toggle selector. The highlighted button uses the same green color as
+  // Highcharts.
+  document.querySelector("#" + currentChannel)
+    .setAttribute("style", "background-color:#90ed7d");
+  Object.keys(channels).forEach(function(channel) {
+    if (channel != currentChannel) {
+      document.querySelector("#" + channel)
+        .setAttribute("style", "background-color:white");
+    }
+  });
+}
+
 // Initialize telemetry.js
 Telemetry.init(function() {
   // For nightly versions, we only have one release per date, so we can
   // construct a single graph for all versions of nightly.
-  makeGraphsForChannel(nightlyVersions);
+  changeView("nightly");
 });
 
-function makeGraphsForChannel(versions) {
+function makeGraphsForChannel(channel) {
   Object.keys(requiredMeasures).forEach(function(m) {
     tsSeries[requiredMeasures[m]] = [];
     volumeSeries[requiredMeasures[m]] = [];
@@ -66,8 +84,8 @@ function makeGraphsForChannel(versions) {
     hostVolume[hostIds[host].series] = [];
   });
 
-  makeTimeseries(versions);
-  makeHostCharts(versions);
+  makeTimeseries(channels[channel]);
+  makeHostCharts(channels[channel]);
 }
 // Sort [date, {rate|volume}] pairs based on the date
 function sortByDate(p1, p2)
