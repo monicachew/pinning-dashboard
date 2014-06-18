@@ -8,17 +8,26 @@ function changesetToPinFileURL(changeset) {
          "/security/manager/boot/src/StaticHPKPins.h";
 }
 
+// To simplify things, just say everything before 9 June 2014 was 32,
+// and everything after is 33. We'll have to update this in the future.
+function buildDateToVersion(timeInMillis) {
+  var mergeDate = new Date("9 June 2014");
+  var date = new Date(timeInMillis);
+  return date < mergeDate ? "32" : "33";
+}
+
 var buildDateToChangesetCache = {};
 function buildDateToChangeset(timeInMillis) {
   var date = new Date(timeInMillis);
   if (buildDateToChangesetCache[date]) {
     return buildDateToChangesetCache[date];
   }
-  // This is fragile (for example, when nightly becomes Firefox 33, this won't
-  // work anymore). I'm told bug 487036 will implement what we actually want
-  // here.
+  // This is fragile (for example, it doesn't handle Aurora builds yet).
+  // I'm told bug 487036 will implement what we actually want here.
+  var versionString = buildDateToVersion(timeInMillis);
   var preURL = "http://ftp.mozilla.org/pub/mozilla.org/firefox/nightly/";
-  var postURL = "-mozilla-central-debug/firefox-32.0a1.en-US.debug-linux-i686.txt";
+  var postURL = "-mozilla-central-debug/firefox-" + versionString +
+                ".0a1.en-US.debug-linux-i686.txt";
   // JSON format appears to be YYYY-MM-DDTHH:MM:SS.MMMZ,
   // where "-", "T", ":", ".", and "Z" are literals.
   // We just want YYYY-MM-DD.
