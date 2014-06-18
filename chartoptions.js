@@ -98,13 +98,13 @@ var moz_flags = {
   data: [
     {
       x: Date.UTC(2014, 5, 5),
-      title: 'Mozilla AMO production',
-      text: 'Mozilla AMO production'
+      title: 'AMO production',
+      text: 'AMO production'
     },
     {
       x: Date.UTC(2014, 5, 8),
-      title: 'Mozilla FxA test',
-      text: 'Mozilla FxA test'
+      title: 'FxA test',
+      text: 'FxA test'
     }
   ]
 };
