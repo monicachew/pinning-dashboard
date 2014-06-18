@@ -8,19 +8,6 @@ var requiredMeasures = {
   "CERT_PINNING_MOZ_RESULTS": 3,
 };
 
-// Versions for which we have any data.
-var versions = [ "nightly/32", "nightly/33" ];
-
-// Array of [[version, measure]] for requesting loadEvolutionOverBuilds.
-var versionedMeasures = [];
-
-var tsSeries = { 0: [], 1: [], 2: [], 3: [] };
-var volumeSeries = { 0: [], 1: [], 2: [], 3: [] };
-var hostSeries = { 0: [], 1: [], 2: [], 3: [] };
-var hostVolumeSeries = { 0: [], 1: [], 2: [], 3: [] };
-
-var minVolume = 1000;
-
 // Per-host measures.
 var hostMeasures = [ "CERT_PINNING_MOZ_TEST_RESULTS_BY_HOST",
                      "CERT_PINNING_MOZ_RESULTS_BY_HOST" ];
@@ -33,7 +20,23 @@ var hostIds = {
   "accounts.firefox.com (test)": { bucket: 4, series: 3 },
 };
 
+// Versions for which we have any data.
+var versions = [ "nightly/32", "nightly/33" ];
+
+// Minimum volume for which to display data
+var minVolume = 1000;
+
+// Array of [[version, measure]] for requesting loadEvolutionOverBuilds.
+var versionedMeasures = [];
+
 // Set up our series
+var tsSeries = {};
+var volumeSeries = {};
+Object.keys(requiredMeasures).forEach(function(m) {
+  tsSeries[requiredMeasures[m]] = [];
+  volumeSeries[requiredMeasures[m]] = [];
+});
+
 var hostRates = [];
 var hostVolume = [];
 Object.keys(hostIds).forEach(function(host) {
@@ -54,9 +57,45 @@ function print(line) {
   document.querySelector('#output').textContent += line + "\n";
 };
 
+// Initialize telemetry.js
+Telemetry.init(function() {
+  // For nightly versions, we only have one release per date, so we can
+  // construct a single graph for all versions of nightly.
+  makeTimeseries();
+  makeHostCharts();
+});
+
+// Sort [date, {rate|volume}] pairs based on the date
+function sortByDate(p1, p2)
+{
+  return p1[0] - p2[0];
+}
+
+// Returns a promise that resolves when all of the versions for all of the
+// required measures have been stuffed into the timeseries.
+function makeTimeseries()
+{
+  // construct a single graph for all versions of nightly
+  var promises = [];
+  versions.forEach(function(v) {
+    promises.push(makeTimeseriesForVersion(v));
+  });
+  return Promise.all(promises)
+    .then(function() {
+      // Wait until all of the series data has been returned before redrawing
+      // highcharts.
+      for (var i in tsSeries) {
+        tsSeries[i] = tsSeries[i].sort(sortByDate);
+        volumeSeries[i] = volumeSeries[i].sort(sortByDate);
+        tsChart.series[i].setData(tsSeries[i], true);
+        volumeChart.series[i].setData(volumeSeries[i], true);
+      }
+    });
+}
+
 // Returns a promise that resolves when all of the requires measures from the
 // given version have had their timeseries added.
-function verifyVersion(v)
+function makeTimeseriesForVersion(v)
 {
   var promises = [];
   var p = new Promise(function(resolve, reject) {
@@ -66,7 +105,7 @@ function verifyVersion(v)
 	// the given measure doesn't exist for that version, so we must make
 	// sure to only call makeTimeseries for measures that exist.
 	if (m in requiredMeasures) {
-          promises.push(makeTimeseries(v, m));
+          promises.push(makeTimeseriesForMeasure(v, m));
         }
       }
       resolve(Promise.all(promises));
@@ -75,39 +114,11 @@ function verifyVersion(v)
   return p;
 }
 
-// Returns a promise that resolves when all of the versions for all of the
-// required measures have been stuffed into the timeseries.
-function verifyMeasures()
-{
-  // construct a single graph for all versions of nightly
-  var promises = [];
-  versions.forEach(function(v) {
-    promises.push(verifyVersion(v));
-  });
-  return Promise.all(promises);
-}
-
-// Initialize telemetry.js
-Telemetry.init(function() {
-  // For nightly versions, we only have one release per date, so we can
-  // construct a single graph for all versions of nightly.
-  verifyMeasures()
-    .then(function() {
-      // Wait until all of the series data has been returned before redrawing
-      // highcharts.
-      for (var i in tsSeries) {
-        tsChart.series[i].setData(tsSeries[i], true);
-        volumeChart.series[i].setData(volumeSeries[i], true);
-      }
-    });
-  makeHostCharts();
-});
-
 // Returns a promise that resolves when all of the data has been loaded for a
 // particular measure. Don't redraw highcharts here because appending to the
 // existing series data will cause a race condition in the event of multiple
 // versions.
-function makeTimeseries(version, measure) {
+function makeTimeseriesForMeasure(version, measure) {
   var index = requiredMeasures[measure];
   var p = new Promise(function(resolve, reject) {
     Telemetry.loadEvolutionOverBuilds(version, measure,
@@ -137,13 +148,36 @@ function makeTimeseries(version, measure) {
   return p;
 }
 
-function setSeries() {
-  for (var i in tsSeries) {
-    print("setting series: " + JSON.stringify(tsSeries[i], undefined, 2));
-    tsChart.series[i].setData(tsSeries[i], true);
-    volumeChart.series[i].setData(volumeSeries[i], true);
-  }
-  return Promise.resolve(true);
+function makeHostCharts() {
+  var promises = [];
+  hostMeasures.forEach(function(m) {
+    versions.forEach(function(v) {
+      promises.push(makeHostChart(v, m));
+    });
+  });
+  Promise.all(promises)
+    .then(function() {
+      Object.keys(hostIds).forEach(function(host) {
+        var i = hostIds[host].series;
+        hostRates[i] = hostRates[i].sort(sortByDate);
+        hostVolume[i] = hostVolume[i].sort(sortByDate);
+        hostChart.series[i].setData(hostRates[i], true);
+        hostVolumeChart.series[i].setData(hostVolume[i], true);
+      });
+    });
+}
+
+// Returns a promise that resolves when the host timeseries is created for a
+// given measure.
+function makeHostChart(version, measure) {
+  return new Promise(function(resolve, reject) {
+    var f = filterEvolution.bind(this, measure);
+    Telemetry.loadEvolutionOverBuilds(version, measure,
+      function(histogramEvolution) {
+        f(histogramEvolution);
+        resolve(true);
+      });
+    });
 }
 
 // Returns true if the host (e.g., "addons.mozilla.org (test)") matches the
@@ -181,33 +215,4 @@ function filterEvolution(measure, histogramEvolution) {
       }
     });
   });
-}
-
-function makeHostCharts() {
-  var promises = [];
-  hostMeasures.forEach(function(m) {
-    versions.forEach(function(v) {
-      promises.push(makeHostChart(v, m));
-    });
-  });
-  Promise.all(promises)
-    .then(function() {
-      Object.keys(hostIds).forEach(function(host) {
-        hostChart.series[hostIds[host].series]
-          .setData(hostRates[hostIds[host].series], true);
-        hostVolumeChart.series[hostIds[host].series]
-          .setData(hostVolume[hostIds[host].series], true);
-      });
-    });
-}
-
-function makeHostChart(version, measure) {
-  return new Promise(function(resolve, reject) {
-    var f = filterEvolution.bind(this, measure);
-    Telemetry.loadEvolutionOverBuilds(version, measure,
-      function(histogramEvolution) {
-        f(histogramEvolution);
-        resolve(true);
-      });
-    });
 }
