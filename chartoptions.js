@@ -93,9 +93,14 @@ var flags = {
       text: 'Mozilla cdn, media production'
     },
     {
-      x: Date.UTC(2014, 5, 13),
+      x: Date.UTC(2014, 5, 12),
       title: 'Google production',
       text: 'Google moved to production'
+    },
+    {
+      x: Date.UTC(2014, 5, 19),
+      title: '*.twitter.com (test)',
+      text: '*.twitter.com (test)'
     },
   ]
 };
