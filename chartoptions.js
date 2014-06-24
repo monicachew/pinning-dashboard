@@ -71,7 +71,7 @@ var commonTooltip = {
     return s;
   },
   positioner: function(labelWidth, labelHeight, point) {
-    return { x: point.plotX - (labelWidth / 2), y: point.plotY - 10};
+    return { x: point.plotX - (labelWidth / 2), y: point.plotY - 10 };
   }
 };
 
