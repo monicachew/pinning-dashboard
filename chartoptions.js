@@ -69,6 +69,9 @@ var commonTooltip = {
       s += "<br/>" + point.series.name + ": " + y;
     });
     return s;
+  },
+  positioner: function(labelWidth, labelHeight, point) {
+    return { x: point.plotX - (labelWidth / 2), y: point.plotY - 10 };
   }
 };
 
