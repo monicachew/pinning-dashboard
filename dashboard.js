@@ -81,8 +81,8 @@ function makeGraphsForChannel(channel) {
     hostVolume[hostIds[host].series] = [];
   });
 
-  makeTimeseries(channels[channel]);
-  makeHostCharts(channels[channel]);
+  makeTimeseries(channel, channels[channel]);
+  makeHostCharts(channel, channels[channel]);
 }
 // Sort [date, {rate|volume}] pairs based on the date
 function sortByDate(p1, p2)
@@ -92,7 +92,7 @@ function sortByDate(p1, p2)
 
 // Returns a promise that resolves when all of the versions for all of the
 // required measures have been stuffed into the timeseries.
-function makeTimeseries(versions)
+function makeTimeseries(channel, versions)
 {
   // construct a single graph for all versions of nightly
   var promises = [];
@@ -109,6 +109,11 @@ function makeTimeseries(versions)
         tsChart.series[i].setData(tsSeries[i], true);
         volumeChart.series[i].setData(volumeSeries[i], true);
       }
+      // This completely doesn't work
+      tsChart.series[tsChart.series.length - 1].setData(
+        channel + "_flags", true);
+      volumeChart.series[volumeChart.series.length - 1].setData(
+        channel + "_flags", true);
     });
 }
 
@@ -164,7 +169,7 @@ function makeTimeseriesForMeasure(version, measure) {
   return p;
 }
 
-function makeHostCharts(versions) {
+function makeHostCharts(channel, versions) {
   var promises = [];
   hostMeasures.forEach(function(m) {
     versions.forEach(function(v) {

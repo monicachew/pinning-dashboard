@@ -73,7 +73,7 @@ var commonTooltip = {
 };
 
 // Events for hosts for which we don't have per-host violations.
-var flags = {
+var nightly_flags = {
   type: 'flags',
   showInLegend: false,
   data: [
@@ -101,6 +101,23 @@ var flags = {
       x: Date.UTC(2014, 5, 19),
       title: '*.twitter.com (test)',
       text: '*.twitter.com (test)'
+    },
+  ]
+};
+
+var aurora_flags = {
+  type: 'flags',
+  showInLegend: false,
+  data: [
+    {
+      x: Date.UTC(2014, 5, 9),
+      title: 'Twitter, cdn, media production',
+      text: 'Twitter moved to production'
+    },
+    {
+      x: Date.UTC(2014, 5, 9),
+      title: 'Google (test)',
+      text: 'Google (test)'
     },
   ]
 };
@@ -167,7 +184,7 @@ var tsOptions = {
            { name: 'Production mode' },
            { name: 'Mozilla test mode' },
            { name: 'Mozilla production mode' },
-           flags
+           nightly_flags
   ]
 };
 
@@ -195,7 +212,7 @@ var volumeOptions = {
            { name: 'Production mode' },
            { name: 'Mozilla test mode' },
            { name: 'Mozilla production mode' },
-           flags
+           nightly_flags
   ]
 };
 
