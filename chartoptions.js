@@ -76,10 +76,8 @@ var commonTooltip = {
 };
 
 // Events for hosts for which we don't have per-host violations.
-var flags = {
-  type: 'flags',
-  showInLegend: false,
-  data: [
+var flag_data = {
+  nightly: [
     {
       x: Date.UTC(2014, 4, 24),
       title: 'Twitter production',
@@ -96,11 +94,33 @@ var flags = {
       text: 'Mozilla cdn, media production'
     },
     {
-      x: Date.UTC(2014, 5, 13),
+      x: Date.UTC(2014, 5, 12),
       title: 'Google production',
       text: 'Google moved to production'
     },
+    {
+      x: Date.UTC(2014, 5, 19),
+      title: '*.twitter.com (test)',
+      text: '*.twitter.com (test)'
+    },
+  ],
+  aurora: [
+    {
+      x: Date.UTC(2014, 5, 9),
+      title: 'Twitter, cdn, media production',
+      text: 'Twitter moved to production'
+    },
+    {
+      x: Date.UTC(2014, 5, 9),
+      title: 'Google (test)',
+      text: 'Google (test)'
+    },
   ]
+};
+
+var flags = {
+  type: 'flags',
+  showInLegend: false
 };
 
 // Events for mozilla hosts for which we have per-host violations.
