@@ -82,7 +82,7 @@ function makeGraphsForChannel(channel) {
   });
 
   makeTimeseries(channel, channels[channel]);
-  makeHostCharts(channel, channels[channel]);
+  makeHostCharts(channels[channel]);
 }
 // Sort [date, {rate|volume}] pairs based on the date
 function sortByDate(p1, p2)
@@ -108,11 +108,9 @@ function makeTimeseries(channel, versions)
         volumeSeries[i] = volumeSeries[i].sort(sortByDate);
         tsChart.series[i].setData(tsSeries[i], true);
         volumeChart.series[i].setData(volumeSeries[i], true);
-        print(i);
       }
       // For some reason, tsChart.series.length == 6!
       var flag_index = 4;
-      print(JSON.stringify(flag_data[channel], undefined, 2));
       tsChart.series[flag_index].setData(flag_data[channel], true);
       volumeChart.series[flag_index].setData(flag_data[channel], true);
     });
@@ -170,7 +168,7 @@ function makeTimeseriesForMeasure(version, measure) {
   return p;
 }
 
-function makeHostCharts(channel, versions) {
+function makeHostCharts(versions) {
   var promises = [];
   hostMeasures.forEach(function(m) {
     versions.forEach(function(v) {
