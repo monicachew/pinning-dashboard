@@ -108,12 +108,13 @@ function makeTimeseries(channel, versions)
         volumeSeries[i] = volumeSeries[i].sort(sortByDate);
         tsChart.series[i].setData(tsSeries[i], true);
         volumeChart.series[i].setData(volumeSeries[i], true);
+        print(i);
       }
-      // This completely doesn't work
-      tsChart.series[tsChart.series.length - 1].setData(
-        channel + "_flags", true);
-      volumeChart.series[volumeChart.series.length - 1].setData(
-        channel + "_flags", true);
+      // For some reason, tsChart.series.length == 6!
+      var flag_index = 4;
+      print(JSON.stringify(flag_data[channel], undefined, 2));
+      tsChart.series[flag_index].setData(flag_data[channel], true);
+      volumeChart.series[flag_index].setData(flag_data[channel], true);
     });
 }
 
