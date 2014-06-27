@@ -123,7 +123,6 @@ var flags = {
   showInLegend: false
 };
 
-
 // Events for mozilla hosts for which we have per-host violations.
 var moz_flags = {
   type: 'flags',
