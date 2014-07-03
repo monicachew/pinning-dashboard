@@ -90,6 +90,31 @@ function sortByDate(p1, p2)
   return p1[0] - p2[0];
 }
 
+// Filter duplicate dates to account for screwed up telemetry data
+function filterDuplicateDates(series)
+{
+  // Work on a copy
+  var s = series;
+
+  // Series is an array of pairs [[date, volume]]. If successive dates have the
+  // same volume, delete
+  for (var i = s.length - 1; i > 0; i--) {
+    if (s[i][0] == s[i-1][0]) {
+      if (s[i][1] > 0) {
+        s.splice(i - 1, 1);
+      } else {
+        s.splice(i, 1);
+      }
+    }
+  }
+  return s;
+}
+
+function normalizeSeries(series)
+{
+  return filterDuplicateDates(series.sort(sortByDate));
+}
+
 // Returns a promise that resolves when all of the versions for all of the
 // required measures have been stuffed into the timeseries.
 function makeTimeseries(channel, versions)
@@ -104,8 +129,8 @@ function makeTimeseries(channel, versions)
       // Wait until all of the series data has been returned before redrawing
       // highcharts.
       for (var i in tsSeries) {
-        tsSeries[i] = tsSeries[i].sort(sortByDate);
-        volumeSeries[i] = volumeSeries[i].sort(sortByDate);
+        tsSeries[i] = normalizeSeries(tsSeries[i]);
+        volumeSeries[i] = normalizeSeries(volumeSeries[i]);
         tsChart.series[i].setData(tsSeries[i], true);
         volumeChart.series[i].setData(volumeSeries[i], true);
       }
@@ -124,10 +149,10 @@ function makeTimeseriesForVersion(v)
   var p = new Promise(function(resolve, reject) {
     Telemetry.measures(v, function(measures) {
       for (var m in measures) {
-	// Telemetry.loadEvolutionOverBuilds(v, m) never calls the callback if
-	// the given measure doesn't exist for that version, so we must make
-	// sure to only call makeTimeseries for measures that exist.
-	if (m in requiredMeasures) {
+        // Telemetry.loadEvolutionOverBuilds(v, m) never calls the callback if
+        // the given measure doesn't exist for that version, so we must make
+        // sure to only call makeTimeseries for measures that exist.
+        if (m in requiredMeasures) {
           promises.push(makeTimeseriesForMeasure(v, m));
         }
       }
@@ -179,8 +204,8 @@ function makeHostCharts(versions) {
     .then(function() {
       Object.keys(hostIds).forEach(function(host) {
         var i = hostIds[host].series;
-        hostRates[i] = hostRates[i].sort(sortByDate);
-        hostVolume[i] = hostVolume[i].sort(sortByDate);
+        hostRates[i] = normalizeSeries(hostRates[i]);
+        hostVolume[i] = normalizeSeries(hostVolume[i]);
         hostChart.series[i].setData(hostRates[i], true);
         hostVolumeChart.series[i].setData(hostVolume[i], true);
       });
