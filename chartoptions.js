@@ -150,13 +150,12 @@ $(function() {
     title: {
       x: -20 //center
     },
-/*
     xAxis: {
       type: 'datetime',
       minTickInterval: 24 * 3600 * 1000,
-      min: minDate.getTime()
+      // Why is this breaking?
+      // min: minDate.getTime()
     },
-*/
     yAxis: {
       min: 0
     },
