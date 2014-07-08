@@ -137,6 +137,11 @@ var moz_flags = {
       x: Date.UTC(2014, 5, 8),
       title: 'FxA test',
       text: 'FxA test'
+    },
+    {
+      x: Date.UTC(2014, 6, 3),
+      title: 'api.FxA test',
+      text: 'api.FxA test'
     }
   ]
 };
@@ -243,6 +248,7 @@ var hostOptions = {
     { name: 'addons.mozilla.org (prod)' },
     { name: 'aus4.mozilla.org (test)' },
     { name: 'accounts.firefox.com (test)' },
+    { name: 'api.accounts.firefox.com (test)' },
     moz_flags
   ]
 };
@@ -272,6 +278,7 @@ var hostVolumeOptions = {
     { name: 'addons.mozilla.org (prod)' },
     { name: 'aus4.mozilla.org (test)' },
     { name: 'accounts.firefox.com (test)' },
+    { name: 'api.accounts.firefox.com (test)' },
     moz_flags
   ]
 };

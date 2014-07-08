@@ -18,6 +18,7 @@ var hostIds = {
   "addons.mozilla.org (prod)": { bucket: 1, series: 1 },
   "aus4.mozilla.org (test)": { bucket: 3, series: 2 },
   "accounts.firefox.com (test)": { bucket: 4, series: 3 },
+  "api.accounts.firefox.com (test)": { bucket: 5, series: 4 },
 };
 
 // Versions for which we have any data.
@@ -253,11 +254,11 @@ function filterEvolution(measure, histogramEvolution) {
       if (data[index] && (data[index] + data[index + 1] > 0)) {
         rate = data[index] / (data[index] + data[index + 1]);
       }
-      if (data[index] + data[index + 1] > minVolume) {
-        hostRates[hostIds[host].series].push([date.getTime(), rate]);
-        hostVolume[hostIds[host].series].push([date.getTime(),
-                                           data[index] + data[index + 1]]);
-      }
+      // Don't filter on minVolume for mozilla hosts, because some hosts like
+      // FxA don't get very much traffic.
+      hostRates[hostIds[host].series].push([date.getTime(), rate]);
+      hostVolume[hostIds[host].series].push([date.getTime(),
+                                             data[index] + data[index + 1]]);
     });
   });
 }
