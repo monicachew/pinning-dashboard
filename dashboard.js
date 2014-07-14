@@ -29,7 +29,7 @@ var channels = {
 var currentChannel = "nightly";
 
 // Minimum volume for which to display data
-var minVolume = 1000;
+var minVolume = 1200;
 
 // Array of [[version, measure]] for requesting loadEvolutionOverBuilds.
 var versionedMeasures = [];
@@ -94,7 +94,7 @@ function sortByDate(p1, p2)
 // Filter duplicate dates to account for screwed up telemetry data
 function filterDuplicateDates(series)
 {
-  // Work on a copy
+  // Work on a copy so we don't cause side-effects without realizing.
   var s = series;
 
   // Series is an array of pairs [[date, volume]]. If successive dates have the
@@ -176,7 +176,7 @@ function makeTimeseriesForMeasure(version, measure) {
           var data = histogram.map(function(count, start, end, index) {
             return count;
           });
-          // Skip dates with fewer than 1000 submissions
+          // Skip dates with fewer than minVolume submissions
           // Failure = 0, success = 1
           if (data[0] + data[1] > minVolume) {
             date.setUTCHours(0);

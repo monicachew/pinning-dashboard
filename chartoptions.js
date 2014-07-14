@@ -103,6 +103,16 @@ var flag_data = {
       title: '*.twitter.com (test)',
       text: '*.twitter.com (test)'
     },
+    {
+      x: Date.UTC(2014, 6, 8),
+      title: '*.twitter.com (prod)',
+      text: '*.twitter.com (prod)'
+    },
+    {
+      x: Date.UTC(2014, 6, 8),
+      title: 'dropbox (test)',
+      text: 'dropbox (test)'
+    },
   ],
   aurora: [
     {
