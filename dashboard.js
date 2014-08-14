@@ -18,13 +18,16 @@ var hostIds = {
   "addons.mozilla.org (prod)": { bucket: 1, series: 1 },
   "aus4.mozilla.org (test)": { bucket: 3, series: 2 },
   "accounts.firefox.com (test)": { bucket: 4, series: 3 },
-  "api.accounts.firefox.com (test)": { bucket: 5, series: 4 },
+  "accounts.firefox.com (prod)": { bucket: 4, series: 4 },
+  "api.accounts.firefox.com (test)": { bucket: 5, series: 5 },
+  "api.accounts.firefox.com (prod)": { bucket: 5, series: 6 },
 };
 
 // Versions for which we have any data.
 var channels = {
-  nightly: [ "nightly/32", "nightly/33" ],
-  aurora: [ "aurora/32" ]
+  nightly: [ "nightly/32", "nightly/33", "nightly/34" ],
+  aurora: [ "aurora/32", "aurora/33" ],
+  beta: [ "beta/32" ]
 };
 var currentChannel = "nightly";
 

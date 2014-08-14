@@ -113,6 +113,11 @@ var flag_data = {
       title: 'dropbox (test)',
       text: 'dropbox (test)'
     },
+    {
+      x: Date.UTC(2014, 7, 7),
+      title: 'dropbox (prod)',
+      text: 'dropbox (prod)'
+    },
   ],
   aurora: [
     {
@@ -152,6 +157,11 @@ var moz_flags = {
       x: Date.UTC(2014, 6, 3),
       title: 'api.FxA test',
       text: 'api.FxA test'
+    },
+    {
+      x: Date.UTC(2014, 6, 16),
+      title: 'FxA prod',
+      text: 'FxA prod'
     }
   ]
 };
@@ -258,7 +268,9 @@ var hostOptions = {
     { name: 'addons.mozilla.org (prod)' },
     { name: 'aus4.mozilla.org (test)' },
     { name: 'accounts.firefox.com (test)' },
+    { name: 'accounts.firefox.com (prod)' },
     { name: 'api.accounts.firefox.com (test)' },
+    { name: 'api.accounts.firefox.com (prod)' },
     moz_flags
   ]
 };
@@ -288,7 +300,9 @@ var hostVolumeOptions = {
     { name: 'addons.mozilla.org (prod)' },
     { name: 'aus4.mozilla.org (test)' },
     { name: 'accounts.firefox.com (test)' },
+    { name: 'accounts.firefox.com (prod)' },
     { name: 'api.accounts.firefox.com (test)' },
+    { name: 'api.accounts.firefox.com (prod)' },
     moz_flags
   ]
 };
