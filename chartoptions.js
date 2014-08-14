@@ -103,6 +103,21 @@ var flag_data = {
       title: '*.twitter.com (test)',
       text: '*.twitter.com (test)'
     },
+    {
+      x: Date.UTC(2014, 6, 8),
+      title: '*.twitter.com (prod)',
+      text: '*.twitter.com (prod)'
+    },
+    {
+      x: Date.UTC(2014, 6, 8),
+      title: 'dropbox (test)',
+      text: 'dropbox (test)'
+    },
+    {
+      x: Date.UTC(2014, 7, 7),
+      title: 'dropbox (prod)',
+      text: 'dropbox (prod)'
+    },
   ],
   aurora: [
     {
@@ -137,6 +152,16 @@ var moz_flags = {
       x: Date.UTC(2014, 5, 8),
       title: 'FxA test',
       text: 'FxA test'
+    },
+    {
+      x: Date.UTC(2014, 6, 3),
+      title: 'api.FxA test',
+      text: 'api.FxA test'
+    },
+    {
+      x: Date.UTC(2014, 6, 16),
+      title: 'FxA prod',
+      text: 'FxA prod'
     }
   ]
 };
@@ -153,7 +178,8 @@ $(function() {
     xAxis: {
       type: 'datetime',
       minTickInterval: 24 * 3600 * 1000,
-      min: minDate.getTime()
+      // Why is this breaking?
+      // min: minDate.getTime()
     },
     yAxis: {
       min: 0
@@ -242,6 +268,9 @@ var hostOptions = {
     { name: 'addons.mozilla.org (prod)' },
     { name: 'aus4.mozilla.org (test)' },
     { name: 'accounts.firefox.com (test)' },
+    { name: 'accounts.firefox.com (prod)' },
+    { name: 'api.accounts.firefox.com (test)' },
+    { name: 'api.accounts.firefox.com (prod)' },
     moz_flags
   ]
 };
@@ -271,6 +300,9 @@ var hostVolumeOptions = {
     { name: 'addons.mozilla.org (prod)' },
     { name: 'aus4.mozilla.org (test)' },
     { name: 'accounts.firefox.com (test)' },
+    { name: 'accounts.firefox.com (prod)' },
+    { name: 'api.accounts.firefox.com (test)' },
+    { name: 'api.accounts.firefox.com (prod)' },
     moz_flags
   ]
 };

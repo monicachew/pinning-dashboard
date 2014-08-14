@@ -18,17 +18,21 @@ var hostIds = {
   "addons.mozilla.org (prod)": { bucket: 1, series: 1 },
   "aus4.mozilla.org (test)": { bucket: 3, series: 2 },
   "accounts.firefox.com (test)": { bucket: 4, series: 3 },
+  "accounts.firefox.com (prod)": { bucket: 4, series: 4 },
+  "api.accounts.firefox.com (test)": { bucket: 5, series: 5 },
+  "api.accounts.firefox.com (prod)": { bucket: 5, series: 6 },
 };
 
 // Versions for which we have any data.
 var channels = {
-  nightly: [ "nightly/32", "nightly/33" ],
-  aurora: [ "aurora/32" ]
+  nightly: [ "nightly/32", "nightly/33", "nightly/34" ],
+  aurora: [ "aurora/32", "aurora/33" ],
+  beta: [ "beta/32" ]
 };
 var currentChannel = "nightly";
 
 // Minimum volume for which to display data
-var minVolume = 1000;
+var minVolume = 1200;
 
 // Array of [[version, measure]] for requesting loadEvolutionOverBuilds.
 var versionedMeasures = [];
@@ -90,6 +94,31 @@ function sortByDate(p1, p2)
   return p1[0] - p2[0];
 }
 
+// Filter duplicate dates to account for screwed up telemetry data
+function filterDuplicateDates(series)
+{
+  // Work on a copy so we don't cause side-effects without realizing.
+  var s = series;
+
+  // Series is an array of pairs [[date, volume]]. If successive dates have the
+  // same volume, delete
+  for (var i = s.length - 1; i > 0; i--) {
+    if (s[i][0] == s[i-1][0]) {
+      if (s[i][1] > 0) {
+        s.splice(i - 1, 1);
+      } else {
+        s.splice(i, 1);
+      }
+    }
+  }
+  return s;
+}
+
+function normalizeSeries(series)
+{
+  return filterDuplicateDates(series.sort(sortByDate));
+}
+
 // Returns a promise that resolves when all of the versions for all of the
 // required measures have been stuffed into the timeseries.
 function makeTimeseries(channel, versions)
@@ -104,8 +133,8 @@ function makeTimeseries(channel, versions)
       // Wait until all of the series data has been returned before redrawing
       // highcharts.
       for (var i in tsSeries) {
-        tsSeries[i] = tsSeries[i].sort(sortByDate);
-        volumeSeries[i] = volumeSeries[i].sort(sortByDate);
+        tsSeries[i] = normalizeSeries(tsSeries[i]);
+        volumeSeries[i] = normalizeSeries(volumeSeries[i]);
         tsChart.series[i].setData(tsSeries[i], true);
         volumeChart.series[i].setData(volumeSeries[i], true);
       }
@@ -124,10 +153,10 @@ function makeTimeseriesForVersion(v)
   var p = new Promise(function(resolve, reject) {
     Telemetry.measures(v, function(measures) {
       for (var m in measures) {
-	// Telemetry.loadEvolutionOverBuilds(v, m) never calls the callback if
-	// the given measure doesn't exist for that version, so we must make
-	// sure to only call makeTimeseries for measures that exist.
-	if (m in requiredMeasures) {
+        // Telemetry.loadEvolutionOverBuilds(v, m) never calls the callback if
+        // the given measure doesn't exist for that version, so we must make
+        // sure to only call makeTimeseries for measures that exist.
+        if (m in requiredMeasures) {
           promises.push(makeTimeseriesForMeasure(v, m));
         }
       }
@@ -150,7 +179,7 @@ function makeTimeseriesForMeasure(version, measure) {
           var data = histogram.map(function(count, start, end, index) {
             return count;
           });
-          // Skip dates with fewer than 1000 submissions
+          // Skip dates with fewer than minVolume submissions
           // Failure = 0, success = 1
           if (data[0] + data[1] > minVolume) {
             date.setUTCHours(0);
@@ -179,8 +208,8 @@ function makeHostCharts(versions) {
     .then(function() {
       Object.keys(hostIds).forEach(function(host) {
         var i = hostIds[host].series;
-        hostRates[i] = hostRates[i].sort(sortByDate);
-        hostVolume[i] = hostVolume[i].sort(sortByDate);
+        hostRates[i] = normalizeSeries(hostRates[i]);
+        hostVolume[i] = normalizeSeries(hostVolume[i]);
         hostChart.series[i].setData(hostRates[i], true);
         hostVolumeChart.series[i].setData(hostVolume[i], true);
       });
@@ -228,11 +257,11 @@ function filterEvolution(measure, histogramEvolution) {
       if (data[index] && (data[index] + data[index + 1] > 0)) {
         rate = data[index] / (data[index] + data[index + 1]);
       }
-      if (data[index] + data[index + 1] > minVolume) {
-        hostRates[hostIds[host].series].push([date.getTime(), rate]);
-        hostVolume[hostIds[host].series].push([date.getTime(),
-                                           data[index] + data[index + 1]]);
-      }
+      // Don't filter on minVolume for mozilla hosts, because some hosts like
+      // FxA don't get very much traffic.
+      hostRates[hostIds[host].series].push([date.getTime(), rate]);
+      hostVolume[hostIds[host].series].push([date.getTime(),
+                                             data[index] + data[index + 1]]);
     });
   });
 }
