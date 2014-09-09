@@ -179,6 +179,9 @@ function makeTimeseriesForMeasure(version, measure) {
           var data = histogram.map(function(count, start, end, index) {
             return count;
           });
+          var csv = histogram.map(function(count, start, end, index) {
+            return [count, start, end, index].join(",");
+          });
           // Skip dates with fewer than minVolume submissions
           // Failure = 0, success = 1
           if (data[0] + data[1] > minVolume) {
@@ -187,6 +190,12 @@ function makeTimeseriesForMeasure(version, measure) {
                                   data[0] / (data[0] + data[1])]);
             volumeSeries[index].push([date.getTime(),
                                       data[0] + data[1]]);
+            if (version == "nightly/34" && measure == "CERT_PINNING_RESULTS" && date.toString().indexOf("Jul 22") != -1) {
+              print(date + "," + (data[0] + data[1]));
+              print("submissions: " + JSON.stringify(histogram.submissions(), undefined, 2));
+              print("map data: " + JSON.stringify(data, undefined, 2));
+              print("csv: " + JSON.stringify(csv, undefined, 2));
+            }
           }
         });
         // We've collected all of the data for this version, so resolve.
