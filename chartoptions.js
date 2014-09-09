@@ -118,6 +118,11 @@ var flag_data = {
       title: 'dropbox (prod)',
       text: 'dropbox (prod)'
     },
+    {
+      x: Date.UTC(2014, 7, 28),
+      title: 'facebook (test)',
+      text: 'facebook (test)'
+    },
   ],
   aurora: [
     {
