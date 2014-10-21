@@ -168,6 +168,11 @@ var moz_flags = {
       title: 'FxA prod',
       text: 'FxA prod'
     }
+    {
+      x: Date.UTC(2014, 9, 11),
+      title: 'services test',
+      text: 'services test'
+    }
   ]
 };
 
@@ -276,6 +281,8 @@ var hostOptions = {
     { name: 'accounts.firefox.com (prod)' },
     { name: 'api.accounts.firefox.com (test)' },
     { name: 'api.accounts.firefox.com (prod)' },
+    { name: 'services.mozilla.com (test)' },
+    { name: 'services.mozilla.com (prod)' },
     moz_flags
   ]
 };
@@ -308,6 +315,8 @@ var hostVolumeOptions = {
     { name: 'accounts.firefox.com (prod)' },
     { name: 'api.accounts.firefox.com (test)' },
     { name: 'api.accounts.firefox.com (prod)' },
+    { name: 'services.mozilla.com (test)' },
+    { name: 'services.mozilla.com (prod)' },
     moz_flags
   ]
 };
