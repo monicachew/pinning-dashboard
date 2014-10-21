@@ -21,13 +21,15 @@ var hostIds = {
   "accounts.firefox.com (prod)": { bucket: 4, series: 4 },
   "api.accounts.firefox.com (test)": { bucket: 5, series: 5 },
   "api.accounts.firefox.com (prod)": { bucket: 5, series: 6 },
+  "services.mozilla.com (test)": { bucket: 6, series: 7 },
+  "services.mozilla.com (prod)": { bucket: 6, series: 8 },
 };
 
 // Versions for which we have any data.
 var channels = {
-  nightly: [ "nightly/32", "nightly/33", "nightly/34", "nightly/35" ],
-  aurora: [ "aurora/32", "aurora/33", "aurora/34" ],
-  beta: [ "beta/32", "beta/33" ]
+  nightly: [ "nightly/32", "nightly/33", "nightly/34", "nightly/35", "nightly/36" ],
+  aurora: [ "aurora/32", "aurora/33", "aurora/34", "aurora/35" ],
+  beta: [ "beta/32", "beta/33", "beta/34" ]
 };
 var currentChannel = "nightly";
 
