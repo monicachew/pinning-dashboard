@@ -124,7 +124,7 @@ var flag_data = {
       text: 'facebook (test)'
     },
     {
-      x: Date.UTC(2014, 9, 2),
+      x: Date.UTC(2014, 10, 2),
       title: 'switch facebook (test)',
       text: 'switch facebook (test)'
     },
