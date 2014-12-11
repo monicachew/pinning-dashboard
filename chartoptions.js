@@ -123,6 +123,11 @@ var flag_data = {
       title: 'facebook (test)',
       text: 'facebook (test)'
     },
+    {
+      x: Date.UTC(2014, 9, 2),
+      title: 'switch facebook (test)',
+      text: 'switch facebook (test)'
+    },
   ],
   aurora: [
     {
