@@ -167,7 +167,7 @@ var moz_flags = {
       x: Date.UTC(2014, 6, 16),
       title: 'FxA prod',
       text: 'FxA prod'
-    }
+    },
     {
       x: Date.UTC(2014, 9, 11),
       title: 'services test',
