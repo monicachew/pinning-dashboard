@@ -123,6 +123,11 @@ var flag_data = {
       title: 'facebook (test)',
       text: 'facebook (test)'
     },
+    {
+      x: Date.UTC(2014, 10, 2),
+      title: 'switch facebook (test)',
+      text: 'switch facebook (test)'
+    },
   ],
   aurora: [
     {
@@ -167,7 +172,7 @@ var moz_flags = {
       x: Date.UTC(2014, 6, 16),
       title: 'FxA prod',
       text: 'FxA prod'
-    }
+    },
     {
       x: Date.UTC(2014, 9, 11),
       title: 'services test',
