@@ -14,27 +14,23 @@ var hostMeasures = [ "CERT_PINNING_MOZ_TEST_RESULTS_BY_HOST",
 
 // Hosts for which we keep per-host pinning violation counts.
 var hostIds = {
-  "addons.mozilla.org (test)": { bucket: 1, series: 0 },
-  "addons.mozilla.org (prod)": { bucket: 1, series: 1 },
+  "addons.mozilla.org (prod)": { bucket: 1, series: 0 },
+  "addons.mozilla.net (prod)": { bucket: 2, series: 1 },
   "aus4.mozilla.org (test)": { bucket: 3, series: 2 },
-  "accounts.firefox.com (test)": { bucket: 4, series: 3 },
-  "accounts.firefox.com (prod)": { bucket: 4, series: 4 },
-  "api.accounts.firefox.com (test)": { bucket: 5, series: 5 },
-  "api.accounts.firefox.com (prod)": { bucket: 5, series: 6 },
-  "services.mozilla.com (test)": { bucket: 6, series: 7 },
-  "services.mozilla.com (prod)": { bucket: 6, series: 8 },
+  "accounts.firefox.com (prod)": { bucket: 4, series: 3 },
+  "api.accounts.firefox.com (prod)": { bucket: 5, series: 4 },
+  "services.mozilla.com (prod)": { bucket: 6, series: 5 },
+  "aus5.mozilla.org (test)": { bucket: 7, series: 6 },
 };
 
 // Versions for which we have any data.
 var channels = {
-  nightly: [ "nightly/32", "nightly/33", "nightly/34", "nightly/35", "nightly/36", "nightly/37" ],
-  aurora: [ "aurora/32", "aurora/33", "aurora/34", "aurora/35", "aurora/36" ],
-  beta: [ "beta/32", "beta/33", "beta/34", "beta/35" ]
+  nightly: [ "nightly/48", "nightly/49", "nightly/50", "nightly/51" ],
+  aurora: [ "aurora/47", "aurora/48", "aurora/49", "aurora/50" ],
+  beta: [ "beta/46", "beta/47", "beta/48", "beta/49" ],
+  release: [ "release/45", "release/46", "release/47", "release/48" ],
 };
 var currentChannel = "nightly";
-
-// Minimum volume for which to display data
-var minVolume = 1200;
 
 // Array of [[version, measure]] for requesting loadEvolutionOverBuilds.
 var versionedMeasures = [];
@@ -58,6 +54,15 @@ function print(line) {
 };
 
 function changeView(channel) {
+  for (var i in tsSeries) {
+    tsChart.series[i].setData(null);
+    volumeChart.series[i].setData(null);
+  }
+  Object.keys(hostIds).forEach(function(host) {
+    var i = hostIds[host].series;
+    hostChart.series[i].setData(null);
+    hostVolumeChart.series[i].setData(null);
+  });
   // Unselect the old channel
   document.querySelector("#" + currentChannel)
       .setAttribute("style", "background-color:white");
@@ -87,8 +92,8 @@ function makeGraphsForChannel(channel) {
     hostVolume[hostIds[host].series] = [];
   });
 
-  makeTimeseries(channel, channels[channel]);
-  makeHostCharts(channels[channel]);
+  makeTimeseries(channel, channels[channel]).then(
+  makeHostCharts(channels[channel]));
 }
 // Sort [date, {rate|volume}] pairs based on the date
 function sortByDate(p1, p2)
@@ -116,9 +121,27 @@ function filterDuplicateDates(series)
   return s;
 }
 
+// Some data points have the same date. Combine their volumes.
+function combineDuplicateDates(series)
+{
+  // Work on a copy so we don't cause side-effects without realizing.
+  var s = series;
+
+  // Series is an array of pairs [[date, volume]].
+  for (var i = s.length - 2; i >= 0; i--) {
+    if (s[i][0] == s[i + 1][0]) {
+      s[i][1] += s[i + 1][1];
+      if (s[i][1] > 0) {
+        s.splice(i + 1, 1);
+      }
+    }
+  }
+  return s;
+}
+
 function normalizeSeries(series)
 {
-  return filterDuplicateDates(series.sort(sortByDate));
+  return combineDuplicateDates(series.sort(sortByDate));
 }
 
 // Returns a promise that resolves when all of the versions for all of the
@@ -140,57 +163,47 @@ function makeTimeseries(channel, versions)
         tsChart.series[i].setData(tsSeries[i], true);
         volumeChart.series[i].setData(volumeSeries[i], true);
       }
-      // For some reason, tsChart.series.length == 6!
-      var flag_index = 4;
-      tsChart.series[flag_index].setData(flag_data[channel], true);
-      volumeChart.series[flag_index].setData(flag_data[channel], true);
     });
 }
 
 // Returns a promise that resolves when all of the requires measures from the
 // given version have had their timeseries added.
-function makeTimeseriesForVersion(v)
-{
+// v is something like "channel/version"
+function makeTimeseriesForVersion(v) {
   var promises = [];
-  var p = new Promise(function(resolve, reject) {
-    Telemetry.measures(v, function(measures) {
-      for (var m in measures) {
-        // Telemetry.loadEvolutionOverBuilds(v, m) never calls the callback if
-        // the given measure doesn't exist for that version, so we must make
-        // sure to only call makeTimeseries for measures that exist.
-        if (m in requiredMeasures) {
-          promises.push(makeTimeseriesForMeasure(v, m));
-        }
-      }
-      resolve(Promise.all(promises));
-    });
-  });
-  return p;
+  for (var m in requiredMeasures) {
+    // Telemetry.loadEvolutionOverBuilds(v, m) never calls the callback if
+    // the given measure doesn't exist for that version, so we must make
+    // sure to only call makeTimeseries for measures that exist.
+    promises.push(makeTimeseriesForMeasure(v, m));
+  }
+  return Promise.all(promises);
 }
 
 // Returns a promise that resolves when all of the data has been loaded for a
 // particular measure. Don't redraw highcharts here because appending to the
 // existing series data will cause a race condition in the event of multiple
 // versions.
+// v is something like "channel/version"
 function makeTimeseriesForMeasure(version, measure) {
   var index = requiredMeasures[measure];
   var p = new Promise(function(resolve, reject) {
-    Telemetry.loadEvolutionOverBuilds(version, measure,
-      function(histogramEvolution) {
-        histogramEvolution.each(function(date, histogram) {
-          var data = histogram.map(function(count, start, end, index) {
-            return count;
-          });
-          // Skip dates with fewer than minVolume submissions
-          // Failure = 0, success = 1
-          if (data[0] + data[1] > minVolume) {
+    Telemetry.getEvolution(version.substring(0, version.indexOf("/")),
+      version.substring(version.indexOf("/") + 1), measure, {}, true,
+      function(histogramEvolutionMap) {
+        let histogramEvolution = histogramEvolutionMap[""]; // ಠ_ಠ
+        if (histogramEvolution) {
+          histogramEvolution.map(function(histogram, i, date) {
+            var data = histogram.map(function(count, start, end, index) {
+              return count;
+            });
             date.setUTCHours(0);
             tsSeries[index].push([date.getTime(),
                                   data[0] / (data[0] + data[1])]);
             volumeSeries[index].push([date.getTime(),
                                       data[0] + data[1]]);
-          }
-        });
+          });
+        }
         // We've collected all of the data for this version, so resolve.
         resolve(true);
       }
@@ -223,18 +236,16 @@ function makeHostCharts(versions) {
 function makeHostChart(version, measure) {
   return new Promise(function(resolve, reject) {
     var f = filterEvolution.bind(this, measure);
-    Telemetry.loadEvolutionOverBuilds(version, measure,
-      function(histogramEvolution) {
-        f(histogramEvolution);
+    Telemetry.getEvolution(version.substring(0, version.indexOf("/")),
+      version.substring(version.indexOf("/") + 1), measure, {}, true,
+      function(histogramEvolutionMap) {
+        let histogramEvolution = histogramEvolutionMap[""]; // ಠ_ಠ
+        if (histogramEvolution) {
+          f(histogramEvolution);
+        }
         resolve(true);
       });
     });
-}
-
-// Returns true if the host (e.g., "addons.mozilla.org (test)") matches the
-// measure type (e.g., "test" or "prod")
-function hostMatchesType(host, type) {
-  return host.indexOf(type) != -1;
 }
 
 // Put the given measure into the host timeseries.
@@ -247,7 +258,7 @@ function filterEvolution(measure, histogramEvolution) {
     return host.indexOf(measureType) != -1;
   });
 
-  histogramEvolution.each(function(date, histogram) {
+  histogramEvolution.map(function(histogram, i, date) {
     var data = histogram.map(function(count, start, end, index) {
       return count;
     });
@@ -259,8 +270,6 @@ function filterEvolution(measure, histogramEvolution) {
       if (data[index] && (data[index] + data[index + 1] > 0)) {
         rate = data[index] / (data[index] + data[index + 1]);
       }
-      // Don't filter on minVolume for mozilla hosts, because some hosts like
-      // FxA don't get very much traffic.
       hostRates[hostIds[host].series].push([date.getTime(), rate]);
       hostVolume[hostIds[host].series].push([date.getTime(),
                                              data[index] + data[index + 1]]);

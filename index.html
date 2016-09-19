@@ -1,17 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
 <title>Public Key Pinning Dashboard</title>
+<script src="https://telemetry.mozilla.org/v2/telemetry.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+<script src="https://code.highcharts.com/stock/highstock.js"></script>
+<script src="https://code.highcharts.com/stock/modules/exporting.js"></script>
+<script src="chartoptions.js"></script>
+<script src="dashboard.js"></script>
+</head>
+
+<body>
 <center>
 <button id=nightly style="background-color:white" onclick="changeView('nightly')">Nightly</button>
 <button id=aurora style="background-color:white" onclick="changeView('aurora')">Aurora</button>
 <button id=beta style="background-color:white" onclick="changeView('beta')">Beta</button>
+<button id=release style="background-color:white" onclick="changeView('release')">Release</button>
 </center>
-<head>
-<script src="http://telemetry.mozilla.org/v1/telemetry.js"></script>
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
-<script src="http://code.highcharts.com/stock/highstock.js"></script>
-<script src="http://code.highcharts.com/stock/modules/exporting.js"></script>
-<script src="chartoptions.js"></script>
-<script src="dashboard.js"></script>
-</head>
 
 <div id="timeseries" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
 <div id="volume" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
@@ -19,3 +25,5 @@
 <div id="hostVolume" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
 
 <pre id="output"></pre>
+</body>
+</html>
