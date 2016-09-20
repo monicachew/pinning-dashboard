@@ -124,24 +124,41 @@ function filterDuplicateDates(series)
 // Some data points have the same date. Combine their volumes.
 function combineDuplicateDates(series)
 {
-  // Work on a copy so we don't cause side-effects without realizing.
-  var s = series;
+  var s = [];
 
-  // Series is an array of pairs [[date, volume]].
-  for (var i = s.length - 2; i >= 0; i--) {
-    if (s[i][0] == s[i + 1][0]) {
-      s[i][1] += s[i + 1][1];
-      if (s[i][1] > 0) {
-        s.splice(i + 1, 1);
+  series.forEach((pair) => {
+    var sameDates = series.filter((matchingPair) => {
+      return matchingPair[0] == pair[0];
+    });
+    var newPair = [pair[0], pair[1] instanceof Rate ? new Rate(0, 0) : 0];
+    sameDates.forEach((matchingPair) => {
+      if (newPair[1] instanceof Rate) {
+        newPair[1].add(matchingPair[1]);
+      } else {
+        newPair[1] += matchingPair[1];
       }
+    });
+    s.push(newPair);
+  });
+  return s;
+}
+
+function collapseRates(series)
+{
+  var s = [];
+  series.forEach((pair) => {
+    if (pair[1] instanceof Rate) {
+      s.push([pair[0], pair[1].toFraction()]);
+    } else {
+      s.push(pair);
     }
-  }
+  });
   return s;
 }
 
 function normalizeSeries(series)
 {
-  return combineDuplicateDates(series.sort(sortByDate));
+  return collapseRates(combineDuplicateDates(series.sort(sortByDate)));
 }
 
 // Returns a promise that resolves when all of the versions for all of the
@@ -199,7 +216,7 @@ function makeTimeseriesForMeasure(version, measure) {
             });
             date.setUTCHours(0);
             tsSeries[index].push([date.getTime(),
-                                  data[0] / (data[0] + data[1])]);
+                                  new Rate(data[0], (data[0] + data[1]))]);
             volumeSeries[index].push([date.getTime(),
                                       data[0] + data[1]]);
           });
@@ -248,6 +265,25 @@ function makeHostChart(version, measure) {
     });
 }
 
+class Rate {
+  constructor(hits, total) {
+    this._hits = hits;
+    this._total = total;
+  }
+
+  add(otherRate) {
+    this._hits += otherRate._hits;
+    this._total += otherRate._total;
+  }
+
+  toFraction() {
+    if (this._total == 0) {
+      return 0;
+    }
+    return this._hits / this._total;
+  }
+}
+
 // Put the given measure into the host timeseries.
 function filterEvolution(measure, histogramEvolution) {
   var measureType = "test";
@@ -266,9 +302,9 @@ function filterEvolution(measure, histogramEvolution) {
     matchingHosts.forEach(function(host) {
       // Failure = index + 0, success = index + 1
       var index = hostIds[host].bucket * 2;
-      var rate = 0;
-      if (data[index] && (data[index] + data[index + 1] > 0)) {
-        rate = data[index] / (data[index] + data[index + 1]);
+      var rate = new Rate(0, 0);
+      if (data[index] && (data[index] + data[index + 1]) > 0) {
+        rate = new Rate(data[index], (data[index] + data[index + 1]));
       }
       hostRates[hostIds[host].series].push([date.getTime(), rate]);
       hostVolume[hostIds[host].series].push([date.getTime(),
