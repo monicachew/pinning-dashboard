@@ -25,10 +25,10 @@ var hostIds = {
 
 // Versions for which we have any data.
 var channels = {
-  nightly: [ "nightly/48", "nightly/49", "nightly/50", "nightly/51" ],
-  aurora: [ "aurora/47", "aurora/48", "aurora/49", "aurora/50" ],
-  beta: [ "beta/46", "beta/47", "beta/48", "beta/49" ],
-  release: [ "release/45", "release/46", "release/47", "release/48" ],
+  nightly: [ "nightly/49", "nightly/50", "nightly/51", "nightly/52" ],
+  aurora: [ "aurora/48", "aurora/49", "aurora/50", "aurora/51" ],
+  beta: [ "beta/47", "beta/48", "beta/49", "beta/50" ],
+  release: [ "release/46", "release/47", "release/48", "release/49" ],
 };
 var currentChannel = "nightly";
 
